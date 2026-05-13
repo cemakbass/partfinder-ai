@@ -27,6 +27,79 @@ function buildSearchLinks(partName: string) {
   };
 }
 
+/**
+ * Claude sometimes wraps JSON in prose or ``` fences. Pull the first top-level `{ ... }` object.
+ */
+function extractFirstJsonObject(raw: string): string | null {
+  const start = raw.indexOf("{");
+  if (start === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = start; i < raw.length; i++) {
+    const c = raw[i]!;
+    if (inString) {
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (c === "\\") {
+        escape = true;
+        continue;
+      }
+      if (c === '"') {
+        inString = false;
+        continue;
+      }
+      continue;
+    }
+    if (c === '"') {
+      inString = true;
+      continue;
+    }
+    if (c === "{") depth++;
+    if (c === "}") {
+      depth--;
+      if (depth === 0) return raw.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
+function parsePartAnalysisJson(text: string): unknown {
+  const trimmed = text.replace(/\uFEFF/g, "").trim();
+  const strippedFences = trimmed
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```\s*$/i, "")
+    .trim();
+
+  const candidates = [strippedFences, trimmed, extractFirstJsonObject(trimmed) ?? ""].filter(Boolean);
+
+  const seen = new Set<string>();
+  for (const candidate of candidates) {
+    if (seen.has(candidate)) continue;
+    seen.add(candidate);
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      /* try next */
+    }
+    const extracted = extractFirstJsonObject(candidate);
+    if (extracted && !seen.has(extracted)) {
+      seen.add(extracted);
+      try {
+        return JSON.parse(extracted);
+      } catch {
+        /* continue */
+      }
+    }
+  }
+
+  throw new Error(
+    "AI response could not be parsed as JSON. The model may have added extra text or the reply was truncated — try again or use a smaller/clearer image."
+  );
+}
+
 function normalizeListings(raw: unknown): NonNullable<PartAnalysisResult["marketplaceListings"]> {
   if (!Array.isArray(raw)) return [];
   const out: NonNullable<PartAnalysisResult["marketplaceListings"]> = [];
@@ -107,6 +180,8 @@ Language rules:
 - Use standard English/OEM-style part naming where appropriate.
 
 Respond ONLY with valid JSON (no markdown):
+Do not write any text before or after the JSON object.
+
 {
   "partName": "string",
   "oemCode": "string",
@@ -147,7 +222,7 @@ If the image is not vehicle damage, still give best-effort part ID and empty dam
 
   const response = await getAnthropicClient().messages.create({
     model: "claude-opus-4-5",
-    max_tokens: 2048,
+    max_tokens: 4096,
     messages: [
       {
         role: "user",
@@ -169,15 +244,12 @@ If the image is not vehicle damage, still give best-effort part ID and empty dam
     ]
   });
 
-  const text = response.content[0]?.type === "text" ? response.content[0].text : "";
-  const clean = text.replace(/```json|```/g, "").trim();
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(clean);
-  } catch {
-    throw new Error("AI response could not be parsed.");
-  }
+  const text = response.content
+    .map((b) => (b.type === "text" ? b.text : ""))
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  const parsed = parsePartAnalysisJson(text);
 
   const base = parsed as PartAnalysisResult;
   const pn = typeof base.partName === "string" && base.partName.trim() ? base.partName.trim() : "car part";
