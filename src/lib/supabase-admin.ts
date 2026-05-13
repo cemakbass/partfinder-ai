@@ -13,11 +13,14 @@ export function getSupabaseAdmin(): SupabaseClient {
     throw new Error(`Missing Supabase server env: ${missing.join(", ")}. Add in Vercel → Settings → Environment Variables → Production, then Redeploy.`);
   }
 
+  const url = supabaseUrl!.trim();
+  const key = serviceRoleKey!.trim();
+
   if (adminClient) {
     return adminClient;
   }
 
-  adminClient = createClient(supabaseUrl, serviceRoleKey, {
+  adminClient = createClient(url, key, {
     auth: {
       persistSession: false,
       autoRefreshToken: false

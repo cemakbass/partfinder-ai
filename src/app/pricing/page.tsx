@@ -20,14 +20,23 @@ export default function PricingPage() {
         body: JSON.stringify({ plan })
       });
 
+      const raw = await res.text();
+      let data: { url?: string; error?: string; hint?: string; stripeCode?: string } = {};
+      try {
+        data = raw ? (JSON.parse(raw) as typeof data) : {};
+      } catch {
+        setError(raw.slice(0, 400) || `Unexpected response (${res.status}).`);
+        return;
+      }
+
       if (res.status === 401) {
         window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
         return;
       }
 
-      const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok) {
-        throw new Error(data.error ?? `Checkout failed (${res.status})`);
+        const parts = [data.error, data.hint, data.stripeCode ? `Stripe code: ${data.stripeCode}` : ""].filter(Boolean);
+        throw new Error(parts.join(" — ") || `Checkout failed (${res.status})`);
       }
       if (!data.url) {
         throw new Error(data.error ?? "No checkout URL returned from server.");
@@ -44,8 +53,21 @@ export default function PricingPage() {
     <main className="min-h-screen bg-zinc-950 px-6 py-12 text-white">
       <div className="mx-auto max-w-5xl">
         <h1 className="mb-3 text-center text-4xl font-black">Pricing</h1>
-        <p className="mb-10 text-center text-zinc-400">Choose your monthly plan.</p>
-        {error && <p className="mb-4 text-center text-red-400">{error}</p>}
+        <p className="mb-10 text-center text-zinc-400">
+          Choose your monthly plan. You must be signed in. Stripe opens in the same tab after you click Subscribe.
+        </p>
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-900/60 bg-red-950/40 px-4 py-3 text-center text-sm text-red-200">
+            <p className="font-semibold">Checkout could not start</p>
+            <p className="mt-2 whitespace-pre-wrap break-words">{error}</p>
+            <p className="mt-3 text-xs text-red-300/90">
+              On Vercel, set <code className="text-red-100">STRIPE_SECRET_KEY</code>,{" "}
+              <code className="text-red-100">STRIPE_PRICE_STARTER</code>, <code className="text-red-100">STRIPE_PRICE_PRO</code>,{" "}
+              <code className="text-red-100">STRIPE_PRICE_ULTRA</code> (all <code className="text-red-100">price_…</code> subscription
+              prices). Test vs live mode must match, then Redeploy.
+            </p>
+          </div>
+        )}
         <div className="grid gap-6 md:grid-cols-3">
           {paidPlans.map((plan) => (
             <div
