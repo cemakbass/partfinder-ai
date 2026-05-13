@@ -16,6 +16,18 @@ function formatAnalyzeError(error: unknown) {
     };
   }
 
+  if (
+    message.includes("Could not resolve authentication method") ||
+    message.includes("apiKey") ||
+    message.includes("ANTHROPIC_API_KEY is not set")
+  ) {
+    return {
+      message:
+        "Anthropic API key is missing or not accepted. In Vercel → Environment Variables, set ANTHROPIC_API_KEY to your key from console.anthropic.com (no quotes, no spaces), then Redeploy.",
+      status: 503
+    };
+  }
+
   return { message, status: 500 };
 }
 

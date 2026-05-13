@@ -1,9 +1,22 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { PartAnalysisResult } from "@/lib/types";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-});
+let anthropicSingleton: Anthropic | undefined;
+let anthropicSingletonKey: string | undefined;
+
+function getAnthropicClient(): Anthropic {
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY is not set on the server. Add your Anthropic API key in Vercel → Settings → Environment Variables (Production), then Redeploy."
+    );
+  }
+  if (!anthropicSingleton || anthropicSingletonKey !== apiKey) {
+    anthropicSingleton = new Anthropic({ apiKey });
+    anthropicSingletonKey = apiKey;
+  }
+  return anthropicSingleton;
+}
 
 function buildSearchLinks(partName: string) {
   const encoded = encodeURIComponent(partName);
@@ -132,7 +145,7 @@ STRICT rules for marketplaceListings:
 
 If the image is not vehicle damage, still give best-effort part ID and empty damageRelatedParts if not applicable.`;
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropicClient().messages.create({
     model: "claude-opus-4-5",
     max_tokens: 2048,
     messages: [
