@@ -31,7 +31,35 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/login?next=/admin");
   }
   if (!isAdminEmail(user.email)) {
-    redirect("/dashboard");
+    return (
+      <div className="min-h-screen bg-zinc-950 px-6 py-16 text-white">
+        <div className="mx-auto max-w-lg rounded-2xl border border-zinc-700 bg-zinc-900 p-8">
+          <h1 className="text-xl font-black text-amber-400">Admin access</h1>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+            You are signed in as <span className="font-mono text-zinc-200">{user.email}</span>, but this address is not listed in the server
+            variable <code className="text-zinc-300">ADMIN_EMAILS</code>.
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+            In <strong className="text-zinc-300">Vercel</strong> → your project → <strong className="text-zinc-300">Settings</strong> →{" "}
+            <strong className="text-zinc-300">Environment Variables</strong>, add or edit:
+          </p>
+          <ul className="mt-3 list-inside list-disc text-sm text-zinc-400">
+            <li>
+              Key: <code className="text-zinc-300">ADMIN_EMAILS</code>
+            </li>
+            <li>
+              Value: your login email exactly (e.g. <code className="text-zinc-300">you@gmail.com</code>). Multiple admins: comma-separated,
+              no spaces around commas is fine.
+            </li>
+            <li>Environment: <strong className="text-zinc-300">Production</strong></li>
+          </ul>
+          <p className="mt-4 text-sm text-zinc-500">Then click Save and Redeploy the project.</p>
+          <Link href="/dashboard" className="mt-8 inline-block text-sm font-semibold text-amber-400 hover:underline">
+            ← Back to dashboard
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
