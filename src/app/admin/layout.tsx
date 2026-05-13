@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServerSupabase, isSupabaseConfigured } from "@/lib/supabase-server";
 import { isAdminEmail } from "@/lib/admin";
+import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!isSupabaseConfigured()) {
@@ -72,7 +73,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
             <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-xs text-zinc-400">{user.email}</span>
           </div>
-          <nav className="flex flex-wrap gap-4 text-sm">
+          <nav className="flex flex-wrap items-center gap-4 text-sm">
             <Link href="/admin" className="text-zinc-400 hover:text-white">
               Overview
             </Link>
@@ -85,6 +86,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/dashboard" className="font-semibold text-amber-400 hover:text-amber-300">
               Back to app
             </Link>
+            <SignOutButton className="rounded-lg border border-zinc-600 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800 hover:text-white disabled:opacity-50" />
           </nav>
         </div>
       </header>

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase-client";
 import { PART_IMAGE_SIGNED_URL_TTL_SECONDS } from "@/lib/storage-image";
 import type { PartAnalysisResult, SearchRecord } from "@/lib/types";
 import { UpgradeModal } from "@/components/upgrade-modal";
+import { SignOutButton } from "@/components/sign-out-button";
 
 interface UserUsage {
   searches_used: number;
@@ -145,6 +146,7 @@ export default function DashboardPage() {
             <a href="/pricing" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-black">
               Upgrade
             </a>
+            <SignOutButton />
           </div>
         </div>
       </header>

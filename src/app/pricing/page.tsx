@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { PLAN_CONFIG } from "@/lib/plans";
+import { SignOutButton } from "@/components/sign-out-button";
 
 const paidPlans = ["starter", "pro", "ultra"] as const;
 
@@ -52,6 +54,12 @@ export default function PricingPage() {
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-12 text-white">
       <div className="mx-auto max-w-5xl">
+        <div className="mb-8 flex flex-wrap items-center justify-end gap-3">
+          <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white">
+            Dashboard
+          </Link>
+          <SignOutButton />
+        </div>
         <h1 className="mb-3 text-center text-4xl font-black">Pricing</h1>
         <p className="mb-10 text-center text-zinc-400">
           Choose your monthly plan. You must be signed in. Stripe opens in the same tab after you click Subscribe.
