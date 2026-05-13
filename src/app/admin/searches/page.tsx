@@ -60,7 +60,7 @@ export default function AdminSearchesPage() {
                 <th className="px-4 py-3">User</th>
                 <th className="px-4 py-3">Part</th>
                 <th className="px-4 py-3">Vehicle</th>
-                <th className="px-4 py-3">Image</th>
+                <th className="px-4 py-3">Photo</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800 bg-zinc-950">
@@ -75,14 +75,30 @@ export default function AdminSearchesPage() {
                     {[r.vehicle_year, r.vehicle_make, r.vehicle_model].filter(Boolean).join(" ") || "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <a
-                      href={r.image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-amber-400 underline"
-                    >
-                      Open
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/api/admin/search-image?searchId=${encodeURIComponent(r.id)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative block h-12 w-12 shrink-0 overflow-hidden rounded border border-zinc-600 bg-zinc-900"
+                        title="View upload (signed, expires soon)"
+                      >
+                        <img
+                          src={`/api/admin/search-image?searchId=${encodeURIComponent(r.id)}`}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </a>
+                      <a
+                        href={`/api/admin/search-image?searchId=${encodeURIComponent(r.id)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-amber-400 underline"
+                      >
+                        Open
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}

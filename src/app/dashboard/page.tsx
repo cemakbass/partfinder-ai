@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase-client";
+import { PART_IMAGE_SIGNED_URL_TTL_SECONDS } from "@/lib/storage-image";
 import type { PartAnalysisResult, SearchRecord } from "@/lib/types";
 import { UpgradeModal } from "@/components/upgrade-modal";
 
@@ -322,12 +323,40 @@ export default function DashboardPage() {
 
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
             <h2 className="mb-3 text-lg font-bold">Last 10 Searches</h2>
+            <p className="mb-3 text-[11px] leading-relaxed text-zinc-500">
+              Thumbnails open through a short-lived signed link (about {Math.floor(PART_IMAGE_SIGNED_URL_TTL_SECONDS / 60)} minutes) for privacy.
+            </p>
             <div className="space-y-2">
               {history.length === 0 && <p className="text-sm text-zinc-500">No history yet.</p>}
               {history.map((item) => (
-                <div key={item.id} className="rounded-lg bg-zinc-800 p-2 text-xs">
-                  <p className="font-semibold text-amber-400">{item.result_json.partName}</p>
-                  <p className="text-zinc-400">{new Date(item.created_at).toLocaleString()}</p>
+                <div key={item.id} className="flex gap-3 rounded-lg bg-zinc-800 p-2 text-xs">
+                  <a
+                    href={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-zinc-600 bg-zinc-900"
+                    title="View photo (short-lived link)"
+                  >
+                    {/* Same-origin URL redirects to a time-limited signed Supabase URL */}
+                    <img
+                      src={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                      alt=""
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </a>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-amber-400">{item.result_json.partName}</p>
+                    <p className="text-zinc-400">{new Date(item.created_at).toLocaleString()}</p>
+                    <a
+                      href={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-[10px] text-zinc-500 underline hover:text-amber-400"
+                    >
+                      Open original
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>

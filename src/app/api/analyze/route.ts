@@ -75,13 +75,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Image upload failed." }, { status: 500 });
     }
 
-    const { data: publicUrlData } = supabaseAdmin.storage.from("part-images").getPublicUrl(fileName);
-
     const { data: searchRecord, error: searchInsertError } = await supabaseAdmin
       .from("searches")
       .insert({
         user_id: user.id,
-        image_url: publicUrlData.publicUrl,
+        image_url: fileName,
         result_json: result,
         vehicle_make: make ?? null,
         vehicle_model: model ?? null,

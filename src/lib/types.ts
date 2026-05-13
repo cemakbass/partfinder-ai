@@ -37,6 +37,7 @@ export interface PartAnalysisResult {
 
 export interface SearchRecord {
   id: string;
+  /** Storage object path in bucket `part-images`, or legacy full public URL until migrated. */
   image_url: string;
   result_json: PartAnalysisResult;
   vehicle_make: string | null;
