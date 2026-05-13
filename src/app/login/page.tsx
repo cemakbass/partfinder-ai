@@ -23,6 +23,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) return;
     setLoading(true);
     setError(null);
 
@@ -51,6 +52,19 @@ export default function LoginPage() {
     <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
       <div className="mx-auto max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
         <h1 className="mb-6 text-3xl font-black">Login</h1>
+        {!supabase ? (
+          <div className="rounded-xl border border-amber-500/30 bg-zinc-950/80 p-4 text-sm text-zinc-400">
+            <p className="font-semibold text-amber-400">App configuration incomplete</p>
+            <p className="mt-2 leading-relaxed">
+              The site is missing <code className="text-zinc-300">NEXT_PUBLIC_SUPABASE_URL</code> or{" "}
+              <code className="text-zinc-300">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>. Add them in your hosting dashboard (e.g. Vercel →
+              Environment Variables), save, then redeploy.
+            </p>
+            <Link href="/" className="mt-4 inline-block text-amber-400 hover:underline">
+              ← Home
+            </Link>
+          </div>
+        ) : (
         <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="email"
@@ -76,12 +90,15 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
+        )}
+        {supabase && (
         <p className="mt-4 text-sm text-zinc-400">
           No account?{" "}
           <Link href="/register" className="text-amber-400">
             Register
           </Link>
         </p>
+        )}
       </div>
     </main>
   );

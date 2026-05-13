@@ -7,6 +7,12 @@ import { isAdminEmail } from "@/lib/admin";
 export async function GET() {
   try {
     const supabase = createServerSupabase();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Server misconfigured: missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY." },
+        { status: 503 }
+      );
+    }
     const {
       data: { user }
     } = await supabase.auth.getUser();

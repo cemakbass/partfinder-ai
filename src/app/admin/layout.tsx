@@ -1,10 +1,28 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerSupabase } from "@/lib/supabase-server";
+import { createServerSupabase, isSupabaseConfigured } from "@/lib/supabase-server";
 import { isAdminEmail } from "@/lib/admin";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createServerSupabase();
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="min-h-screen bg-zinc-950 px-6 py-16 text-white">
+        <div className="mx-auto max-w-lg rounded-2xl border border-amber-500/30 bg-zinc-900 p-8">
+          <h1 className="text-xl font-black text-amber-400">Supabase not configured</h1>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+            Set <code className="text-zinc-300">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+            <code className="text-zinc-300">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in your host (e.g. Vercel → Project → Settings →
+            Environment Variables), then redeploy.
+          </p>
+          <Link href="/" className="mt-6 inline-block text-sm font-semibold text-amber-400 hover:underline">
+            ← Back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const supabase = createServerSupabase()!;
   const {
     data: { user }
   } = await supabase.auth.getUser();

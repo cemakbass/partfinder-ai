@@ -32,6 +32,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadInitialData = async () => {
+      if (!supabase) {
+        setUsageLoadError(
+          "App is missing Supabase settings (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY). Add them in Vercel → Environment Variables, then redeploy."
+        );
+        setError(
+          "App is missing Supabase settings (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY). Add them in Vercel → Environment Variables, then redeploy."
+        );
+        setUsageLoading(false);
+        return;
+      }
+
       const { data: authData } = await supabase.auth.getUser();
       if (!authData.user) {
         window.location.href = "/login";

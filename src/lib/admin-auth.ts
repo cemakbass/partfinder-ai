@@ -7,6 +7,10 @@ export type AdminAuthResult =
 
 export async function getAdminSession(): Promise<AdminAuthResult> {
   const supabase = createServerSupabase();
+  if (!supabase) {
+    return { ok: false, reason: "unauthorized" };
+  }
+
   const {
     data: { user }
   } = await supabase.auth.getUser();
