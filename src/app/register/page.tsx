@@ -24,7 +24,14 @@ export default function RegisterPage() {
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
       if (signUpError) {
-        setError(signUpError.message);
+        const dup =
+          /already registered|already exists|user already|duplicate/i.test(signUpError.message) ||
+          signUpError.code === "user_already_exists";
+        setError(
+          dup
+            ? "An account with this email already exists. Sign in instead or use “Forgot password” on the login page."
+            : signUpError.message
+        );
         setLoading(false);
         return;
       }
@@ -32,6 +39,15 @@ export default function RegisterPage() {
       if (!data.user) {
         setError(
           "Could not create account. If email confirmation is enabled, check your inbox — you may need to confirm before signing in."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const identities = data.user.identities;
+      if (Array.isArray(identities) && identities.length === 0) {
+        setError(
+          "An account with this email already exists. Sign in instead or use “Forgot password” on the login page."
         );
         setLoading(false);
         return;

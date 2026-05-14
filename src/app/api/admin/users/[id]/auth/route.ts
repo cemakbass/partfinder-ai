@@ -52,6 +52,10 @@ export async function POST(request: NextRequest, context: { params: { id: string
       if (banError) {
         return NextResponse.json({ error: banError.message }, { status: 400 });
       }
+
+      if (banDuration === "none") {
+        await admin.from("login_throttle").delete().eq("user_id", userId);
+      }
     }
 
     if (hasEmail) {

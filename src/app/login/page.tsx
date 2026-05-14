@@ -28,21 +28,33 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const signInPromise = supabase.auth.signInWithPassword({ email, password });
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error("Login request timed out. Check your Supabase URL/key and network.")), 15000);
-      });
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 15000);
 
-      const { error: signInError } = await Promise.race([signInPromise, timeoutPromise]);
-      if (signInError) {
-        setError(signInError.message);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        signal: controller.signal,
+        body: JSON.stringify({ email, password })
+      });
+      window.clearTimeout(timeoutId);
+
+      const payload = (await res.json().catch(() => ({}))) as { error?: string };
+
+      if (!res.ok) {
+        setError(payload.error ?? "Failed to sign in.");
         return;
       }
 
       router.push(redirectTo);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to sign in.");
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Login request timed out. Check your network and Supabase configuration.");
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to sign in.");
+      }
     } finally {
       setLoading(false);
     }
@@ -82,6 +94,11 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3"
           />
+          <div className="text-right text-sm">
+            <Link href="/forgot-password" className="text-amber-400 hover:underline">
+              Forgot password?
+            </Link>
+          </div>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <button
             disabled={loading}
