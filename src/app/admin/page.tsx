@@ -6,6 +6,7 @@ import Link from "next/link";
 interface Stats {
   userCount: number;
   searchCount: number;
+  visitCount: number;
   planBreakdown: Record<string, number>;
   recentSearches: Array<{
     id: string;
@@ -62,6 +63,11 @@ export default function AdminOverviewPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Total searches</p>
           <p className="mt-2 text-3xl font-black text-amber-400">{stats.searchCount}</p>
         </div>
+        <Link href="/admin/visitors" className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-zinc-600">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Page views</p>
+          <p className="mt-2 text-3xl font-black text-zinc-100">{stats.visitCount ?? 0}</p>
+          <p className="mt-2 text-xs text-amber-400">View visitors →</p>
+        </Link>
         {Object.entries(stats.planBreakdown).map(([plan, count]) => (
           <div key={plan} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Plan: {plan}</p>

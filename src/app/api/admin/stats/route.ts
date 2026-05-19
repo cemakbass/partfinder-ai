@@ -24,6 +24,12 @@ export async function GET() {
       return NextResponse.json({ error: searchCountError.message }, { status: 500 });
     }
 
+    const { count: visitCountRaw, error: visitCountError } = await admin
+      .from("site_visits")
+      .select("*", { count: "exact", head: true });
+    const visitCount =
+      visitCountError?.message.includes("site_visits") ? 0 : (visitCountRaw ?? 0);
+
     const { data: planRows, error: planError } = await admin.from("users").select("plan");
     if (planError) {
       return NextResponse.json({ error: planError.message }, { status: 500 });
@@ -48,6 +54,7 @@ export async function GET() {
     return NextResponse.json({
       userCount: userCount ?? 0,
       searchCount: searchCount ?? 0,
+      visitCount: visitCount ?? 0,
       planBreakdown,
       recentSearches: recent ?? []
     });
