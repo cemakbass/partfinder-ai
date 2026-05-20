@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-client";
+import { getAuthCallbackUrl } from "@/lib/auth-redirect";
 
 export default function RegisterPage() {
   const supabase = createClient();
@@ -27,7 +28,11 @@ export default function RegisterPage() {
     setMessage(null);
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: getAuthCallbackUrl() }
+      });
       if (signUpError) {
         const dup =
           /already registered|already exists|user already|duplicate/i.test(signUpError.message) ||

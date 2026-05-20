@@ -2,6 +2,18 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
+  const code = request.nextUrl.searchParams.get("code");
+  if (
+    code &&
+    (request.nextUrl.pathname === "/" || request.nextUrl.pathname === "/login")
+  ) {
+    const callback = new URL("/auth/callback", request.url);
+    callback.searchParams.set("code", code);
+    const next = request.nextUrl.searchParams.get("next");
+    if (next) callback.searchParams.set("next", next);
+    return NextResponse.redirect(callback);
+  }
+
   const response = NextResponse.next({ request });
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -47,5 +59,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin", "/admin/:path*"]
+  matcher: ["/", "/login", "/dashboard/:path*", "/admin", "/admin/:path*"]
 };
