@@ -1,12 +1,23 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { HomeJsonLd, homeFaqs } from "@/components/seo/home-json-ld";
+import { buildPageMetadata } from "@/lib/seo";
 import { PLAN_CONFIG, PLANS } from "@/lib/plans";
 
-export const metadata: Metadata = {
-  title: "PartFinder AI — Turn a part photo into OEM codes, fitment & buy links",
+export const metadata: Metadata = buildPageMetadata({
+  title: "PartFinder AI — Identify Car Parts by Photo | OEM Codes & Fitment (USA)",
   description:
-    "Upload a photo of any automotive part. Get part name, OEM code, compatible vehicles, damage context, curated store links, and recent searches—powered by vision AI. Start free."
-};
+    "US-focused AI tool: snap a photo of any auto part, get OEM-style numbers, year/make/model fitment hints, and links to Amazon, RockAuto, AutoZone & more. Free monthly identifications.",
+  path: "/",
+  keywords: [
+    "identify car parts by photo",
+    "OEM part number lookup USA",
+    "auto parts identification app",
+    "collision repair parts finder",
+    "RockAuto OEM lookup",
+    "AutoZone part number search"
+  ]
+});
 
 function IconCamera({ className }: { className?: string }) {
   return (
@@ -89,8 +100,8 @@ const features = [
     icon: IconTruck
   },
   {
-    title: "Retail shortcuts",
-    body: "Jump straight to major parts retailers with prefilled search context. Fewer tabs, less copy-paste, faster checkout research.",
+    title: "US retailer shortcuts",
+    body: "Jump to Amazon, RockAuto, AutoZone, and O'Reilly with prefilled search context—built for how American DIYers and shops already buy parts.",
     icon: IconCart
   },
   {
@@ -125,6 +136,33 @@ const steps = [
   }
 ] as const;
 
+const usAudiences = [
+  {
+    title: "DIY & weekend wrenchers",
+    body: "Skip hours of forum scrolling. Get a starting OEM reference and fitment direction before you drive to the parts store or order online for delivery across the US."
+  },
+  {
+    title: "Independent repair shops",
+    body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber."
+  },
+  {
+    title: "Collision & body shops",
+    body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review."
+  },
+  {
+    title: "Salvage & fleet operations",
+    body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible."
+  }
+] as const;
+
+const usKeywordsBlock = [
+  "car part identification by photo",
+  "OEM part number lookup",
+  "automotive fitment research",
+  "collision parts catalog search",
+  "aftermarket vs OEM cross-reference starting point"
+];
+
 function HeroMockCard() {
   return (
     <div className="relative rounded-2xl border border-zinc-700/80 bg-zinc-900/90 p-5 shadow-2xl shadow-black/40 ring-1 ring-white/5 backdrop-blur-sm">
@@ -158,6 +196,7 @@ function HeroMockCard() {
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
+      <HomeJsonLd />
       <nav className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 px-4 py-4 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <Link href="/" className="text-lg font-black tracking-tight sm:text-xl">
@@ -170,6 +209,9 @@ export default function LandingPage() {
             </Link>
             <Link href="#pricing" className="hidden text-sm text-zinc-400 hover:text-white md:inline">
               Pricing
+            </Link>
+            <Link href="#faq" className="hidden text-sm text-zinc-400 hover:text-white md:inline">
+              FAQ
             </Link>
             <Link href="/login" className="text-sm text-zinc-400 hover:text-white">
               Sign in
@@ -194,15 +236,16 @@ export default function LandingPage() {
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/25 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200">
               <IconChip className="h-4 w-4" />
-              Vision AI for automotive parts
+              AI auto part identification · United States
             </p>
             <h1 className="text-4xl font-black leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
-              Know the part.
-              <span className="block text-amber-400">Buy it faster.</span>
+              Identify any car part
+              <span className="block text-amber-400">from one photo.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-400">
-              PartFinder AI turns a single photo into structured intel—names, codes, fitment hints, damage context, retailer shortcuts, and
-              optional listing previews—so DIYers, shops, and estimators spend less time searching and more time fixing.
+              PartFinder AI helps US drivers and repair professionals turn a smartphone picture into OEM-style part numbers, vehicle fitment
+              hints, damage notes, and quick links to major American retailers—so you spend less time guessing and more time ordering the right
+              component.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
@@ -250,6 +293,48 @@ export default function LandingPage() {
                 <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-800/80 bg-zinc-950 px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Built for the US automotive aftermarket</h2>
+            <p className="mt-4 text-lg leading-relaxed text-zinc-400">
+              Whether you are in a home garage in Texas, a body shop in California, or a fleet yard in the Midwest, PartFinder AI speaks the
+              language of American parts research: OEM references, domestic fitment years, and retailer shortcuts you already use.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+            {usAudiences.map(({ title, body }) => (
+              <article key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+                <h3 className="text-lg font-bold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-16 sm:px-6" aria-labelledby="seo-topics">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 sm:p-10">
+          <h2 id="seo-topics" className="text-2xl font-black tracking-tight sm:text-3xl">
+            Car part lookup by photo — how US teams use PartFinder AI
+          </h2>
+          <div className="mt-6 space-y-4 text-sm leading-relaxed text-zinc-400 sm:text-base">
+            <p>
+              Searching for an unknown component usually means bouncing between forums, PDF catalogs, and five open retailer tabs.
+              PartFinder AI compresses that workflow: upload an image, receive a structured report with a suggested part name,{" "}
+              <strong className="font-semibold text-zinc-200">OEM-style reference code</strong>, likely year/make/model fitment, and optional
+              damage context for collision work.
+            </p>
+            <p>
+              The platform is designed for the <strong className="font-semibold text-zinc-200">United States market</strong>: pricing in USD,
+              monthly search allowances that match shop volume, and outbound shortcuts toward US ecommerce and parts chains. Results are
+              research aids—always confirm against your VIN, trim level, and supplier catalog before install or warranty decisions.
+            </p>
+            <p className="text-zinc-500">Common searches we support: {usKeywordsBlock.join(" · ")}.</p>
           </div>
         </div>
       </section>
@@ -339,46 +424,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="px-4 py-16 sm:px-6">
+      <section id="faq" className="scroll-mt-24 px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-2xl font-black">Questions</h2>
+          <h2 className="text-center text-2xl font-black sm:text-3xl">Frequently asked questions</h2>
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm text-zinc-500">
+            Answers for US drivers, DIYers, and repair shops using photo-based part identification.
+          </p>
           <div className="mt-8 space-y-3">
-            <details className="group rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4 open:bg-zinc-900/60">
-              <summary className="cursor-pointer list-none font-semibold text-white [&::-webkit-details-marker]:hidden">
-                <span className="flex items-center justify-between gap-2">
-                  Is PartFinder AI a substitute for a mechanic?
-                  <span className="text-zinc-500 transition group-open:rotate-180">▼</span>
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                No. Outputs are research aids. Always confirm fitment, torque specs, and safety-critical work with a qualified technician and
-                OEM documentation.
-              </p>
-            </details>
-            <details className="group rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4 open:bg-zinc-900/60">
-              <summary className="cursor-pointer list-none font-semibold text-white [&::-webkit-details-marker]:hidden">
-                <span className="flex items-center justify-between gap-2">
-                  What kind of photo works best?
-                  <span className="text-zinc-500 transition group-open:rotate-180">▼</span>
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                Well-lit, in-focus shots with the part filling most of the frame. Include casting numbers or stickers when possible. Add
-                make, model, and year in the dashboard form when you know them.
-              </p>
-            </details>
-            <details className="group rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4 open:bg-zinc-900/60">
-              <summary className="cursor-pointer list-none font-semibold text-white [&::-webkit-details-marker]:hidden">
-                <span className="flex items-center justify-between gap-2">
-                  Are marketplace prices real-time?
-                  <span className="text-zinc-500 transition group-open:rotate-180">▼</span>
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-                Listing hints are AI-synthesized for orientation only. Inventory and pricing change constantly—open each retailer link and
-                verify before you buy.
-              </p>
-            </details>
+            {homeFaqs.map((f) => (
+              <details key={f.question} className="group rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4 open:bg-zinc-900/60">
+                <summary className="cursor-pointer list-none font-semibold text-white [&::-webkit-details-marker]:hidden">
+                  <span className="flex items-center justify-between gap-2">
+                    {f.question}
+                    <span className="text-zinc-500 transition group-open:rotate-180" aria-hidden>
+                      ▼
+                    </span>
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.answer}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>

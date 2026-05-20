@@ -60,9 +60,9 @@ export default function PricingPage() {
           </Link>
           <SignOutButton />
         </div>
-        <h1 className="mb-3 text-center text-4xl font-black">Pricing</h1>
+        <h1 className="mb-3 text-center text-4xl font-black">US auto part identification pricing</h1>
         <p className="mb-10 text-center text-zinc-400">
-          Choose your monthly plan. You must be signed in. Stripe opens in the same tab after you click Subscribe.
+          Choose a monthly plan for photo-based OEM lookup and fitment research. Sign in required. Secure checkout via Stripe (USD).
         </p>
         {error && (
           <div className="mb-6 rounded-xl border border-red-900/60 bg-red-950/40 px-4 py-3 text-center text-sm text-red-200">

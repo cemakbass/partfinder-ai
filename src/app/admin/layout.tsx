@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServerSupabase, isSupabaseConfigured } from "@/lib/supabase-server";
 import { isAdminEmail } from "@/lib/admin";
 import { SignOutButton } from "@/components/sign-out-button";
+import { buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Admin",
+  path: "/admin",
+  noIndex: true
+});
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!isSupabaseConfigured()) {
