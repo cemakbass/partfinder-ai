@@ -29,4 +29,13 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+import { withSentryConfig } from "@sentry/nextjs";
+
+const hasSentry = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
+
+export default hasSentry
+  ? withSentryConfig(nextConfig, {
+      silent: true,
+      disableLogger: true
+    })
+  : nextConfig;

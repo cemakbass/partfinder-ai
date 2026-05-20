@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { analyzeCarPart } from "@/lib/anthropic";
 import { getOrCreateUserProfile } from "@/lib/user-profile";
+import { maybeSendLimitEmails } from "@/lib/limit-emails";
 
 const allowedMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -115,10 +116,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const usageRow = incrementedUsage[0] as { searches_used: number; searches_limit: number };
+    void maybeSendLimitEmails(user.id, user.email, usageRow.searches_used, usageRow.searches_limit).catch(() => undefined);
+
     return NextResponse.json({
       success: true,
       data: result,
-      usage: incrementedUsage[0],
+      usage: usageRow,
       search: searchRecord
     });
   } catch (error) {

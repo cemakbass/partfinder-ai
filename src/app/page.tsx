@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { SiteFooter } from "@/components/site-footer";
 import { HomeJsonLd, homeFaqs } from "@/components/seo/home-json-ld";
 import { buildPageMetadata } from "@/lib/seo";
 import { PLAN_CONFIG, PLANS } from "@/lib/plans";
@@ -466,30 +467,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-zinc-800 px-4 py-10 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-bold">
-              Part<span className="text-amber-400">Finder</span> AI
-            </p>
-            <p className="mt-2 max-w-md text-xs leading-relaxed text-zinc-500">
-              AI identification is for reference only. Always verify with a qualified mechanic and official parts data before installation or
-              warranty decisions.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-400">
-            <Link href="/pricing" className="hover:text-white">
-              Pricing
-            </Link>
-            <Link href="/login" className="hover:text-white">
-              Sign in
-            </Link>
-            <Link href="/register" className="hover:text-white">
-              Register
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

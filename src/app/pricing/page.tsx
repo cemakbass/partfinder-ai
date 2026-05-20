@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PLAN_CONFIG } from "@/lib/plans";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -10,6 +10,41 @@ const paidPlans = ["starter", "pro", "ultra"] as const;
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasPaidPlan, setHasPaidPlan] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/me", { credentials: "include" });
+        if (!res.ok) return;
+        const data = await res.json();
+        const plan = (data.usage as { plan?: string })?.plan ?? "free";
+        setHasPaidPlan(plan !== "free");
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
+
+  const openBillingPortal = async () => {
+    setError(null);
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (res.status === 401) {
+        window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
+        return;
+      }
+      if (!res.ok) throw new Error(data.error ?? "Billing portal failed");
+      if (data.url) window.location.assign(data.url as string);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Billing portal failed");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const checkout = async (plan: "starter" | "pro" | "ultra") => {
     setError(null);
@@ -58,6 +93,16 @@ export default function PricingPage() {
           <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white">
             Dashboard
           </Link>
+          {hasPaidPlan ? (
+            <button
+              type="button"
+              disabled={portalLoading}
+              onClick={() => void openBillingPortal()}
+              className="rounded-lg border border-zinc-600 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-400 disabled:opacity-50"
+            >
+              {portalLoading ? "Opening..." : "Manage billing"}
+            </button>
+          ) : null}
           <SignOutButton />
         </div>
         <h1 className="mb-3 text-center text-4xl font-black">US auto part identification pricing</h1>

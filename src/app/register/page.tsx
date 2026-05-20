@@ -13,10 +13,15 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supabase) return;
+    if (!acceptedTerms) {
+      setError("You must agree to the Terms of Service and Privacy Policy.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -52,6 +57,8 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
+
+      void fetch("/api/email/welcome", { method: "POST" }).catch(() => undefined);
 
       setMessage("Account created. Redirecting…");
       setTimeout(() => router.push("/dashboard"), 1200);
@@ -101,10 +108,29 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3"
           />
+          <label className="flex cursor-pointer items-start gap-3 text-sm text-zinc-400">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-1 rounded border-zinc-600"
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/terms" className="text-amber-400 hover:underline" target="_blank">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-amber-400 hover:underline" target="_blank">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           {message && <p className="text-sm text-green-400">{message}</p>}
           <button
-            disabled={loading}
+            disabled={loading || !acceptedTerms}
             className="w-full rounded-lg bg-amber-400 py-3 font-bold text-black disabled:opacity-60"
           >
             {loading ? "Creating..." : "Register"}

@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export interface UserProfileUsage {
   searches_used: number;
   searches_limit: number;
+  plan: string;
+  stripe_customer_id: string | null;
 }
 
 export async function getOrCreateUserProfile(
@@ -13,7 +15,7 @@ export async function getOrCreateUserProfile(
 
   const { data: existing, error: existingError } = await supabaseAdmin
     .from("users")
-    .select("searches_used, searches_limit")
+    .select("searches_used, searches_limit, plan, stripe_customer_id")
     .eq("id", userId)
     .maybeSingle();
 
@@ -34,7 +36,7 @@ export async function getOrCreateUserProfile(
       searches_used: 0,
       searches_limit: 2
     })
-    .select("searches_used, searches_limit")
+    .select("searches_used, searches_limit, plan, stripe_customer_id")
     .single();
 
   if (createError || !created) {

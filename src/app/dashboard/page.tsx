@@ -10,6 +10,8 @@ import { SignOutButton } from "@/components/sign-out-button";
 interface UserUsage {
   searches_used: number;
   searches_limit: number;
+  plan: string;
+  stripe_customer_id: string | null;
 }
 
 export default function DashboardPage() {
@@ -28,9 +30,14 @@ export default function DashboardPage() {
   const [result, setResult] = useState<PartAnalysisResult | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentSearchId, setCurrentSearchId] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const remaining = userUsage ? Math.max(userUsage.searches_limit - userUsage.searches_used, 0) : null;
+  const hasPaidPlan = userUsage ? userUsage.plan !== "free" : false;
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -74,9 +81,52 @@ export default function DashboardPage() {
     void loadInitialData();
   }, [supabase]);
 
+  const openBillingPortal = async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Billing portal failed");
+      if (data.url) window.location.assign(data.url as string);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Billing portal failed");
+    }
+  };
+
+  const createShareLink = async (searchId: string) => {
+    setShareLoading(true);
+    setShareCopied(false);
+    setError(null);
+    try {
+      const res = await fetch(`/api/searches/${searchId}/share`, { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not create share link");
+      setShareUrl(data.url as string);
+    } catch (e) {
+      setShareUrl(null);
+      setError(e instanceof Error ? e.message : "Could not create share link");
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const copyShareLink = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      window.setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      setError("Could not copy link. Select and copy manually.");
+    }
+  };
+
   const handleImageSelect = (file: File) => {
     setImage(file);
     setResult(null);
+    setCurrentSearchId(null);
+    setShareUrl(null);
+    setShareCopied(false);
     setError(null);
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result as string);
@@ -115,11 +165,17 @@ export default function DashboardPage() {
       }
 
       setResult(data.data as PartAnalysisResult);
-      setUserUsage({
+      const search = data.search as SearchRecord;
+      setCurrentSearchId(search.id);
+      setShareUrl(null);
+      setShareCopied(false);
+      setUserUsage((prev) => ({
+        plan: prev?.plan ?? "free",
+        stripe_customer_id: prev?.stripe_customer_id ?? null,
         searches_limit: data.usage.searches_limit,
         searches_used: data.usage.searches_used
-      });
-      setHistory((prev) => [data.search as SearchRecord, ...prev].slice(0, 10));
+      }));
+      setHistory((prev) => [search, ...prev].slice(0, 10));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analyze failed");
     } finally {
@@ -143,9 +199,19 @@ export default function DashboardPage() {
             <span className="text-sm text-zinc-400">
               {usageLoading || remaining === null ? "Loading usage..." : `${remaining} searches left`}
             </span>
-            <a href="/pricing" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-black">
-              Upgrade
-            </a>
+            {hasPaidPlan ? (
+              <button
+                type="button"
+                onClick={() => void openBillingPortal()}
+                className="rounded-lg border border-zinc-600 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-400"
+              >
+                Manage billing
+              </button>
+            ) : (
+              <a href="/pricing" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-black">
+                Upgrade
+              </a>
+            )}
             <SignOutButton />
           </div>
         </div>
@@ -317,6 +383,48 @@ export default function DashboardPage() {
                 {result.additionalNotes ? (
                   <div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-2 text-xs text-zinc-400">
                     {result.additionalNotes}
+                  </div>
+                ) : null}
+
+                {currentSearchId ? (
+                  <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-3">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Share report</p>
+                    <p className="mb-2 text-[11px] text-zinc-500">Read-only link, valid for 7 days. Recipient can print or save as PDF.</p>
+                    {!shareUrl ? (
+                      <button
+                        type="button"
+                        disabled={shareLoading}
+                        onClick={() => void createShareLink(currentSearchId)}
+                        className="w-full rounded-lg bg-zinc-700 py-2 text-xs font-bold text-white hover:bg-zinc-600 disabled:opacity-50"
+                      >
+                        {shareLoading ? "Creating link..." : "Create share link"}
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        <input
+                          readOnly
+                          value={shareUrl}
+                          className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-300"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void copyShareLink()}
+                            className="flex-1 rounded-lg bg-amber-400 py-2 text-xs font-bold text-black"
+                          >
+                            {shareCopied ? "Copied" : "Copy link"}
+                          </button>
+                          <a
+                            href={shareUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 rounded-lg border border-zinc-600 py-2 text-center text-xs font-semibold text-zinc-200"
+                          >
+                            Open
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : null}
               </div>

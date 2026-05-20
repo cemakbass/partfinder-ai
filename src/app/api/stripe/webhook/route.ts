@@ -29,12 +29,17 @@ export async function POST(request: Request) {
     const userId = session.metadata?.userId;
     const plan = session.metadata?.plan as "starter" | "pro" | "ultra" | undefined;
     if (userId && plan) {
+      const customerId =
+        typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
       await supabaseAdmin
         .from("users")
         .update({
           plan,
           searches_limit: PLAN_CONFIG[plan].searchLimit,
-          searches_used: 0
+          searches_used: 0,
+          limit_warned_at: null,
+          limit_reached_emailed_at: null,
+          ...(customerId ? { stripe_customer_id: customerId } : {})
         })
         .eq("id", userId);
     }
