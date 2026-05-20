@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
-  formatDetection: { email: false, address: false, telephone: false }
+  formatDetection: { email: false, address: false, telephone: false },
+  verification: {
+    google: "X4rQjE7t__Ju9P6t9nCihh9Hq_XzytijlCLDkyyAYns"
+  }
 };
 
 export default function RootLayout({
