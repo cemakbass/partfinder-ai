@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PRODUCTION_SITE_URL, resolveAppBaseUrl } from "@/lib/app-url";
 
 export const SITE_NAME = "PartFinder AI";
 export const SITE_LOCALE = "en_US";
@@ -24,13 +25,10 @@ export const DEFAULT_KEYWORDS = [
 ];
 
 export function getSiteUrl(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
-  }
-  return "https://avtopartfinder.com";
+  return resolveAppBaseUrl();
 }
+
+export { PRODUCTION_SITE_URL };
 
 export function absoluteUrl(path: string): string {
   const base = getSiteUrl();
