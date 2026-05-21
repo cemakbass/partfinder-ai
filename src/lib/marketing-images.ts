@@ -1,4 +1,10 @@
-export type MarketingImage = { src: string; alt: string; label?: string };
+export type MarketingImage = {
+  src: string;
+  alt: string;
+  label?: string;
+  /** Scene/lifestyle photos use cover; catalog shots use contain (default). */
+  fit?: "contain" | "cover";
+};
 
 /** Real catalog-style part photos (white-background product shots). */
 export const REAL_PARTS = {
@@ -51,6 +57,21 @@ export const REAL_PARTS = {
 
 /** Site section assignments (all real product photography). */
 export const MARKETING_IMAGES = {
+  capturePart: {
+    src: "/marketing/capture-part-phone.png",
+    alt: "Driver photographing front-end collision damage with a smartphone at the roadside",
+    fit: "cover"
+  },
+  runAnalyzer: {
+    src: "/marketing/run-analyzer-dashboard.png",
+    alt: "PartFinder AI dashboard with upload fields, Identify part action, and usage stats",
+    fit: "cover"
+  },
+  verifyPurchase: {
+    src: "/marketing/verify-purchase-report.png",
+    alt: "PartFinder AI identification report with OEM code, damage notes, related parts, and retailer listings",
+    fit: "cover"
+  },
   hero: REAL_PARTS.brakePadKit,
   brakePad: REAL_PARTS.brakePadsStack,
   fuelSystem: REAL_PARTS.fuelInjector,
@@ -62,14 +83,9 @@ export const MARKETING_IMAGES = {
   suspension: REAL_PARTS.cvBootKit
 } as const;
 
+/** Landing gallery — watermark-free product shots only. */
 export const PART_GALLERY: readonly MarketingImage[] = [
-  REAL_PARTS.brakePadKit,
-  REAL_PARTS.brakePadsStack,
   REAL_PARTS.fuelInjector,
-  REAL_PARTS.cvJointKit,
-  REAL_PARTS.cvBootKit,
-  REAL_PARTS.acEvaporator,
-  REAL_PARTS.blowerMotor,
   REAL_PARTS.carBattery,
   REAL_PARTS.headlightSensor
 ];

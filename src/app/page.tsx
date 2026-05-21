@@ -136,17 +136,17 @@ const steps = [
   {
     title: "Capture the part",
     body: "Use your phone in the bay or lot. Include part numbers or stampings when visible—optional vehicle fields sharpen results.",
-    image: MARKETING_IMAGES.brakePad
+    image: MARKETING_IMAGES.capturePart
   },
   {
     title: "Run the analyzer",
     body: "Our engine calls a leading vision model, then structures OEM clues, fitment, links, and notes into a single readable report.",
-    image: MARKETING_IMAGES.fuelSystem
+    image: MARKETING_IMAGES.runAnalyzer
   },
   {
     title: "Verify & purchase",
     body: "Use the report as a lab notebook, not a warranty. Confirm with a pro, then follow retailer links or your preferred supplier.",
-    image: MARKETING_IMAGES.electrical
+    image: MARKETING_IMAGES.verifyPurchase
   }
 ] as const;
 

@@ -17,7 +17,7 @@ export function PartGallery() {
           </div>
           <p className="font-mono text-xs uppercase tracking-wider text-amber-400/80">Catalog-style examples</p>
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
+        <div className="mt-8 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
           {PART_GALLERY.map((item) => (
             <figure
               key={item.src}

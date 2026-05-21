@@ -15,15 +15,18 @@ export function ProductImage({
   sizes?: string;
   priority?: boolean;
 }) {
+  const cover = image.fit === "cover";
   return (
-    <div className={`relative overflow-hidden bg-white ${fill ? "h-full w-full" : ""} ${className}`}>
+    <div
+      className={`relative overflow-hidden ${cover ? "bg-zinc-900" : "bg-white"} ${fill ? "h-full w-full" : ""} ${className}`}
+    >
       <Image
         src={image.src}
         alt={image.alt}
         fill={fill}
         priority={priority}
         sizes={sizes}
-        className="object-contain p-3 sm:p-4"
+        className={cover ? "object-cover" : "object-contain p-3 sm:p-4"}
       />
     </div>
   );
