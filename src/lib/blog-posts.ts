@@ -4,6 +4,8 @@ export type BlogPost = {
   description: string;
   publishedAt: string;
   readMinutes: number;
+  /** Short label for card chips (Stitch-style category) */
+  category: string;
   sections: { heading: string; paragraphs: string[] }[];
 };
 
@@ -15,6 +17,7 @@ export const blogPosts: BlogPost[] = [
       "Step-by-step workflow for DIYers and shops: what to photograph, how OEM lookup works, and when to trust AI part identification.",
     publishedAt: "2026-05-20",
     readMinutes: 6,
+    category: "Identification",
     sections: [
       {
         heading: "Why photos beat guesswork",
@@ -46,6 +49,7 @@ export const blogPosts: BlogPost[] = [
       "How body shops and independent garages move from mystery component to orderable OEM-style reference without wasting catalog time.",
     publishedAt: "2026-05-20",
     readMinutes: 5,
+    category: "OEM lookup",
     sections: [
       {
         heading: "OEM vs aftermarket",
@@ -76,6 +80,7 @@ export const blogPosts: BlogPost[] = [
       "How estimators use photo-based identification to document damaged components and related parts for US collision workflows.",
     publishedAt: "2026-05-20",
     readMinutes: 5,
+    category: "Collision",
     sections: [
       {
         heading: "Speed on the lift",
