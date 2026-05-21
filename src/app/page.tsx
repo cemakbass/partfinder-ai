@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroVisual } from "@/components/marketing/hero-visual";
 import { PartGallery } from "@/components/marketing/part-gallery";
+import { ProductImage } from "@/components/marketing/product-image";
 import { HomeJsonLd, homeFaqs } from "@/components/seo/home-json-ld";
 import { MARKETING_IMAGES } from "@/lib/marketing-images";
 import { buildPageMetadata } from "@/lib/seo";
@@ -104,31 +104,31 @@ const features = [
     title: "Fitment you can act on",
     body: "See likely compatible makes, models, and years—not just a guess—so you can double-check with your VIN or parts desk before you order.",
     icon: IconTruck,
-    image: MARKETING_IMAGES.engineScan
+    image: MARKETING_IMAGES.fuelSystem
   },
   {
     title: "US retailer shortcuts",
     body: "Jump to Amazon, RockAuto, AutoZone, and O'Reilly with prefilled search context—built for how American DIYers and shops already buy parts.",
     icon: IconCart,
-    image: MARKETING_IMAGES.logistics
+    image: MARKETING_IMAGES.hvac
   },
   {
     title: "Collision & listing context",
     body: "Optional damage notes, related parts to inspect, and up to three synthesized marketplace-style listings with prices and stock hints—always verify on the seller’s site.",
     icon: IconBolt,
-    image: MARKETING_IMAGES.heroWorkshop
+    image: MARKETING_IMAGES.sensor
   },
   {
     title: "History on your account",
     body: "Signed-in users keep a rolling history of analyses so you can revisit a job site photo or share results with a shop or insurer.",
     icon: IconClock,
-    image: MARKETING_IMAGES.aiViz
+    image: MARKETING_IMAGES.climate
   },
   {
     title: "Plans that match volume",
     body: "Start on a free monthly allowance, then scale with Stripe-backed subscriptions when you’re running regular estimates or fleet checks.",
     icon: IconShield,
-    image: MARKETING_IMAGES.sparkPlug
+    image: MARKETING_IMAGES.electrical
   }
 ] as const;
 
@@ -141,12 +141,12 @@ const steps = [
   {
     title: "Run the analyzer",
     body: "Our engine calls a leading vision model, then structures OEM clues, fitment, links, and notes into a single readable report.",
-    image: MARKETING_IMAGES.aiViz
+    image: MARKETING_IMAGES.fuelSystem
   },
   {
     title: "Verify & purchase",
     body: "Use the report as a lab notebook, not a warranty. Confirm with a pro, then follow retailer links or your preferred supplier.",
-    image: MARKETING_IMAGES.sparkPlug
+    image: MARKETING_IMAGES.electrical
   }
 ] as const;
 
@@ -159,17 +159,17 @@ const usAudiences = [
   {
     title: "Independent repair shops",
     body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber.",
-    image: MARKETING_IMAGES.oilFilter
+    image: MARKETING_IMAGES.fuelSystem
   },
   {
     title: "Collision & body shops",
     body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review.",
-    image: MARKETING_IMAGES.heroWorkshop
+    image: MARKETING_IMAGES.sensor
   },
   {
     title: "Salvage & fleet operations",
     body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible.",
-    image: MARKETING_IMAGES.engineScan
+    image: MARKETING_IMAGES.drivetrain
   }
 ] as const;
 
@@ -275,15 +275,9 @@ export default function LandingPage() {
                 className="group overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 transition hover:border-zinc-700 hover:bg-zinc-900/80"
               >
                 {image ? (
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      fill
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
+                  <div className="relative aspect-[16/10] overflow-hidden border-b border-zinc-800">
+                    <ProductImage image={image} sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent pointer-events-none" />
                   </div>
                 ) : null}
                 <div className="p-6">
@@ -312,8 +306,8 @@ export default function LandingPage() {
             {usAudiences.map(({ title, body, image }) => (
               <article key={title} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
                 <div className="relative aspect-[2/1] sm:aspect-[5/2]">
-                  <Image src={image.src} alt={image.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                  <ProductImage image={image} sizes="(max-width: 640px) 100vw, 50vw" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent pointer-events-none" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-white">{title}</h3>
@@ -330,14 +324,8 @@ export default function LandingPage() {
       <section className="px-4 py-16 sm:px-6" aria-labelledby="seo-topics">
         <div className="mx-auto grid max-w-6xl gap-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 lg:grid-cols-2 lg:gap-0">
           <div className="relative min-h-[220px] lg:min-h-full">
-            <Image
-              src={MARKETING_IMAGES.logistics.src}
-              alt={MARKETING_IMAGES.logistics.alt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-zinc-950/50 lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-900/90" />
+            <ProductImage image={MARKETING_IMAGES.hvac} sizes="(max-width: 1024px) 100vw, 50vw" />
+            <div className="absolute inset-0 bg-zinc-950/40 lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-900/90 pointer-events-none" />
           </div>
           <div className="p-8 sm:p-10">
           <h2 id="seo-topics" className="text-2xl font-black tracking-tight sm:text-3xl">
@@ -371,8 +359,8 @@ export default function LandingPage() {
             {steps.map((item, idx) => (
               <li key={item.title} className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 pt-10">
                 <div className="relative aspect-[16/10]">
-                  <Image src={item.image.src} alt={item.image.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/30 to-transparent" />
+                  <ProductImage image={item.image} sizes="(max-width: 768px) 100vw, 33vw" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/40 to-transparent pointer-events-none" />
                 </div>
                 <div className="relative p-6">
                   <span className="absolute left-6 top-0 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-amber-400 text-sm font-black text-black">
@@ -477,16 +465,9 @@ export default function LandingPage() {
       </section>
 
       <section className="relative overflow-hidden border-t border-zinc-800 px-4 py-16 sm:px-6">
-        <div className="absolute inset-0">
-          <Image
-            src={MARKETING_IMAGES.heroWorkshop.src}
-            alt=""
-            fill
-            className="object-cover opacity-25"
-            sizes="100vw"
-            aria-hidden
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/90 to-amber-500/10" aria-hidden />
+        <div className="absolute inset-0 opacity-20" aria-hidden>
+          <ProductImage image={MARKETING_IMAGES.hero} sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/95 to-amber-500/10" />
         </div>
         <div className="relative mx-auto max-w-4xl text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to name that part?</h2>

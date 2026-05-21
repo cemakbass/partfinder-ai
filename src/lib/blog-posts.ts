@@ -19,8 +19,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 6,
     category: "Identification",
-    coverImage: "/blog/covers/identify-car-part-by-photo.jpg",
-    coverAlt: "Close-up of a ceramic brake pad — the kind of clear, well-lit part photo that works best for AI identification",
+    coverImage: "/marketing/parts/brake-pads-stack.png",
+    coverAlt: "Stack of disc brake pads on a white background — example of a clear catalog-style photo for AI identification",
     sections: [
       {
         heading: "Why photos beat guesswork",
@@ -53,8 +53,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 5,
     category: "OEM lookup",
-    coverImage: "/blog/covers/oem-part-number-lookup.jpg",
-    coverAlt: "Macro photo of an engine block with digital scan overlays — illustrating OEM-style reference lookup from physical stampings",
+    coverImage: "/marketing/parts/fuel-injector.png",
+    coverAlt: "Gasoline direct-injection fuel injector — real OEM-style component used for part-number research",
     sections: [
       {
         heading: "OEM vs aftermarket",
@@ -86,8 +86,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 5,
     category: "Collision",
-    coverImage: "/blog/covers/collision-parts-research.jpg",
-    coverAlt: "Collision shop technician using a tablet to scan an engine with 3D wireframe overlays for supplement documentation",
+    coverImage: "/marketing/parts/headlight-sensor.png",
+    coverAlt: "Headlight level sensor with linkage arm — typical collision-adjacent component for supplement documentation",
     sections: [
       {
         heading: "Speed on the lift",

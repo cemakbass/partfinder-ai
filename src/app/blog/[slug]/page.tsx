@@ -43,9 +43,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           Back to blog
         </Link>
 
-        <div className="relative mb-8 mt-6 aspect-[21/9] overflow-hidden rounded-2xl border border-outline-variant">
-          <img src={post.coverImage} alt={post.coverAlt} className="h-full w-full object-cover" />
-          <p className="mt-2 text-center text-xs text-on-surface-variant">{post.coverAlt}</p>
+        <div className="relative mb-8 mt-6 aspect-[21/9] overflow-hidden rounded-2xl border border-outline-variant bg-white">
+          <img src={post.coverImage} alt={post.coverAlt} className="h-full w-full object-contain p-4" />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">

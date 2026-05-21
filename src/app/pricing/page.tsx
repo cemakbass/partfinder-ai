@@ -93,10 +93,10 @@ export default function PricingPage() {
       <div className="relative overflow-hidden border-b border-zinc-800">
         <div className="absolute inset-0">
           <Image
-            src={MARKETING_IMAGES.aiViz.src}
+            src={MARKETING_IMAGES.hero.src}
             alt=""
             fill
-            className="object-cover opacity-30"
+            className="object-contain p-12 opacity-25"
             sizes="100vw"
             aria-hidden
           />

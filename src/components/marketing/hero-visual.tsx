@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { MARKETING_IMAGES } from "@/lib/marketing-images";
+import { ProductImage } from "@/components/marketing/product-image";
 
 function HeroMockCard() {
   return (
@@ -32,14 +32,13 @@ function HeroMockCard() {
 }
 
 export function HeroVisual() {
-  const img = MARKETING_IMAGES.heroWorkshop;
   return (
     <div className="relative lg:pl-4">
       <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-500/10 via-transparent to-zinc-800/30 blur-2xl" aria-hidden />
       <div className="relative overflow-hidden rounded-2xl border border-zinc-700/60 shadow-2xl shadow-black/50">
         <div className="relative aspect-[4/3] sm:aspect-[16/11]">
-          <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 520px" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
+          <ProductImage image={MARKETING_IMAGES.hero} priority sizes="(max-width: 1024px) 100vw, 520px" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/10 to-transparent pointer-events-none" />
         </div>
         <div className="relative -mt-16 mx-4 mb-4 sm:-mt-20">
           <HeroMockCard />
