@@ -27,7 +27,7 @@ function PostCard({ post, showNew }: { post: BlogPost; showNew?: boolean }) {
       className="group rounded-2xl border border-outline-variant bg-surface-container p-2 transition-all hover:border-primary/30"
     >
       <div className="relative mb-4 aspect-video overflow-hidden rounded-xl">
-        <img src={post.coverImage} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <img src={post.coverImage} alt={post.coverAlt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         {showNew ? (
           <span className="absolute right-2 top-2 rounded bg-error-container px-2 py-0.5 text-[10px] font-bold text-on-error-container">
             NEW
@@ -105,7 +105,7 @@ export function BlogIndexClient() {
                   <div className="aspect-[21/9] overflow-hidden">
                     <img
                       src={featured.coverImage}
-                      alt=""
+                      alt={featured.coverAlt}
                       className="h-full w-full scale-105 object-cover grayscale transition-all duration-700 group-hover:scale-100 group-hover:grayscale-0"
                     />
                   </div>

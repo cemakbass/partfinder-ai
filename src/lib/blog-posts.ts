@@ -4,23 +4,11 @@ export type BlogPost = {
   description: string;
   publishedAt: string;
   readMinutes: number;
-  /** Short label for card chips (Stitch-style category) */
   category: string;
   coverImage: string;
+  coverAlt: string;
   sections: { heading: string; paragraphs: string[] }[];
 };
-
-/** Stitch / blog hero imagery (hosted on Google CDN). */
-export const BLOG_IMAGES = {
-  featured:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBqcsg5B8CRb1umbi5-YYvOpPULVqnWqWCpGitU3w8ibZHshwAJLtgQ_4EnXtIgE3I_GcD93XuaZxaX0sCMgOrk_5H5UMFsO9RaUEbGSN1Z_NW3JuOdc5lfxP-r7Ayq7B4UaRK9nOQQDBTm_joYXaMzrYFF2iiM94NTnQBCFz07emCWp9_AKrb5mxka1KsjF7MXY_oCeSniT_Hfta4zdUXNWNnZVFqqhMVlXo9B1EoXbVUOc3nOmBHBFVcOJPdn73q2t9v6_t4eICn-",
-  engine:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCXLDTYavDw7uBONF23rKCuby37HSRBd5rfStWl6gOB2uuMCMAmssevhMvqta9hG2L7Qscqp6tbDr2c1y5uwC6HY8laB8zBayZ2RPZgaOVOCI9PBZBf_e_Jdpk8EmeLhWfgoy23sXpEjj6E2eD0JCTtR2Gv4IBYmYhDSRFk2jMMir8aNkzVOAozr1Qpuzcd4uC80aR1wFW4OmWd4tK4JJsFFtdQNxpc4XnSEJJvfGMiJ2Pl313PEPIKGR8liin8WIuIAdmAxzklNTuR",
-  workshop:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDdVG1mIHFJkSUkWppOsl0jHx6PEY1gK4kct-eM_x8XllhgUj5seeleLkZTDiWy4rKUwzhj4spA4eCaWGolY20d-bBW-fai0iCaY8TuPKoGeaPqsQmXfT1VXsydfKWs0dtUEexjVz37um5nqMJ23JsC99MCejlgXYZ7U0fm1wsIEZ6Q_iPDTt8ALyoPD9Baqd4uEWYyxtF6lMms4oLLvjjj8vfstk7m6QoEbuAfiXQH_atR8QzMqNDqsbaf7uCgW3QPJZelnA9MGKQz",
-  server:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuB7oiEBl6ZXx3NWgMGU04gK8p6O-qCGeBozYqbRZwe3wzq8dwzZSVsO1YKFCnEzjJ9QdVAlp0QcS11Z8wc8pUzvMHPcp-Omls85uipBlaVFd7m5-Mx7qBfYqTEYDQIVvfwxemsvLfuHs-7VJgKKUVQ4Z8K_DmWte71CQ8H-Y4V69XD-srgWCd0r1HiRZT6Y5PHv1HarbBgu9CovwjU5aEc0197gLch_2DvXonpRhtcyoHwc4EglN1FLUOt5bAG3TugzupwYA5dSsDPO"
-} as const;
 
 export const blogPosts: BlogPost[] = [
   {
@@ -31,7 +19,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 6,
     category: "Identification",
-    coverImage: BLOG_IMAGES.featured,
+    coverImage: "/blog/covers/identify-car-part-by-photo.jpg",
+    coverAlt: "Close-up of a ceramic brake pad — the kind of clear, well-lit part photo that works best for AI identification",
     sections: [
       {
         heading: "Why photos beat guesswork",
@@ -64,7 +53,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 5,
     category: "OEM lookup",
-    coverImage: BLOG_IMAGES.engine,
+    coverImage: "/blog/covers/oem-part-number-lookup.jpg",
+    coverAlt: "Macro photo of an engine block with digital scan overlays — illustrating OEM-style reference lookup from physical stampings",
     sections: [
       {
         heading: "OEM vs aftermarket",
@@ -96,7 +86,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2026-05-20",
     readMinutes: 5,
     category: "Collision",
-    coverImage: BLOG_IMAGES.workshop,
+    coverImage: "/blog/covers/collision-parts-research.jpg",
+    coverAlt: "Collision shop technician using a tablet to scan an engine with 3D wireframe overlays for supplement documentation",
     sections: [
       {
         heading: "Speed on the lift",
