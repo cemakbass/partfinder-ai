@@ -1,17 +1,26 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase-client";
 import { PART_IMAGE_SIGNED_URL_TTL_SECONDS } from "@/lib/storage-image";
+import { formatRelativeTime } from "@/lib/relative-time";
 import type { PartAnalysisResult, SearchRecord } from "@/lib/types";
 import { UpgradeModal } from "@/components/upgrade-modal";
 import { SignOutButton } from "@/components/sign-out-button";
+import { AnalysisResult } from "@/components/dashboard/analysis-result";
+import { MaterialIcon } from "@/components/dashboard/material-icon";
 
 interface UserUsage {
   searches_used: number;
   searches_limit: number;
   plan: string;
   stripe_customer_id: string | null;
+}
+
+function confidenceLabel(confidence: string): string {
+  const map: Record<string, string> = { high: "HIGH", medium: "MED", low: "LOW" };
+  return map[confidence] ?? confidence.toUpperCase();
 }
 
 export default function DashboardPage() {
@@ -35,9 +44,11 @@ export default function DashboardPage() {
   const [shareLoading, setShareLoading] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const scannerRef = useRef<HTMLElement>(null);
 
   const remaining = userUsage ? Math.max(userUsage.searches_limit - userUsage.searches_used, 0) : null;
   const hasPaidPlan = userUsage ? userUsage.plan !== "free" : false;
+  const planLabel = userUsage?.plan ? userUsage.plan.charAt(0).toUpperCase() + userUsage.plan.slice(1) : "—";
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -183,51 +194,133 @@ export default function DashboardPage() {
     }
   };
 
+  const pickImage = () => fileInputRef.current?.click();
+
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <header className="border-b border-zinc-800 px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <h1 className="text-xl font-black">
-            Part<span className="text-amber-400">Finder</span> AI
+    <div className="min-h-screen bg-pf-background text-pf-on-surface">
+      {/* Sidebar — desktop */}
+      <nav className="fixed left-0 top-0 z-50 hidden h-screen w-64 flex-col border-r border-pf-outline-variant/60 bg-pf-surface-container py-6 lg:flex">
+        <div className="mb-8 px-6">
+          <h1 className="text-xl font-bold text-pf-primary">
+            Part<span className="text-pf-primary-container">Finder</span> AI
           </h1>
-          <div className="flex items-center gap-3">
-            {isAdmin && (
-              <a href="/admin" className="text-sm font-semibold text-zinc-300 hover:text-amber-400">
-                Admin
-              </a>
-            )}
-            <span className="text-sm text-zinc-400">
-              {usageLoading || remaining === null ? "Loading usage..." : `${remaining} searches left`}
-            </span>
-            {hasPaidPlan ? (
-              <button
-                type="button"
-                onClick={() => void openBillingPortal()}
-                className="rounded-lg border border-zinc-600 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-amber-400"
-              >
-                Manage billing
-              </button>
-            ) : (
-              <a href="/pricing" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-black">
-                Upgrade
-              </a>
-            )}
-            <SignOutButton />
+          <p className="mt-1 font-dashboard-mono text-[10px] uppercase tracking-wider text-pf-on-surface-variant/70">
+            Part identification
+          </p>
+        </div>
+
+        <div className="flex-1 space-y-1 px-3">
+          <span className="flex items-center gap-3 rounded-lg border-r-4 border-pf-primary-container bg-pf-primary-container/10 px-4 py-2.5 font-semibold text-pf-primary">
+            <MaterialIcon name="dashboard" className="text-xl" />
+            Dashboard
+          </span>
+          <Link
+            href="/pricing"
+            className="flex items-center gap-3 rounded-lg px-4 py-2.5 font-medium text-pf-on-surface-variant transition-colors hover:bg-pf-surface-container-high"
+          >
+            <MaterialIcon name="payments" className="text-xl" />
+            Pricing
+          </Link>
+          {isAdmin ? (
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 rounded-lg px-4 py-2.5 font-medium text-pf-on-surface-variant transition-colors hover:bg-pf-surface-container-high"
+            >
+              <MaterialIcon name="admin_panel_settings" className="text-xl" />
+              Admin
+            </Link>
+          ) : null}
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-lg px-4 py-2.5 font-medium text-pf-on-surface-variant transition-colors hover:bg-pf-surface-container-high"
+          >
+            <MaterialIcon name="home" className="text-xl" />
+            Home
+          </Link>
+        </div>
+
+        <div className="mt-auto space-y-4 px-6">
+          <button
+            type="button"
+            onClick={pickImage}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-pf-primary-container py-3 text-sm font-semibold text-pf-on-primary-container transition-transform active:scale-[0.98]"
+          >
+            <MaterialIcon name="center_focus_strong" />
+            Scan new part
+          </button>
+          <div className="space-y-1 border-t border-pf-outline-variant/40 pt-4">
+            <Link href="/privacy" className="flex items-center gap-2 px-2 py-1 text-sm text-pf-on-surface-variant hover:text-pf-on-surface">
+              <MaterialIcon name="help_outline" className="text-lg" />
+              Privacy
+            </Link>
           </div>
+        </div>
+      </nav>
+
+      {/* Top bar */}
+      <header className="fixed right-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-pf-outline-variant/60 bg-pf-surface px-4 lg:left-64 lg:w-[calc(100%-16rem)] lg:px-6">
+        <div className="flex items-center gap-3 lg:hidden">
+          <Link href="/" className="text-lg font-bold text-pf-primary">
+            Part<span className="text-pf-primary-container">Finder</span>
+          </Link>
+        </div>
+
+        <div className="hidden items-center gap-2 rounded-full bg-pf-surface-container-high px-4 py-1.5 text-sm text-pf-on-surface-variant md:flex">
+          <MaterialIcon name="analytics" className="text-lg text-pf-primary-container" />
+          {usageLoading || remaining === null ? (
+            <span>Loading usage…</span>
+          ) : (
+            <span>
+              <strong className="text-pf-on-surface">{remaining}</strong> identifications left · {planLabel} plan
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link href="/pricing" className="hidden text-sm text-pf-on-surface-variant hover:text-pf-on-surface sm:inline">
+            Pricing
+          </Link>
+          {isAdmin ? (
+            <Link href="/admin" className="hidden text-sm text-pf-on-surface-variant hover:text-pf-primary-container sm:inline">
+              Admin
+            </Link>
+          ) : null}
+          {hasPaidPlan ? (
+            <button
+              type="button"
+              onClick={() => void openBillingPortal()}
+              className="hidden rounded-lg border border-pf-outline-variant px-3 py-1.5 text-xs font-semibold sm:inline-block"
+            >
+              Billing
+            </button>
+          ) : (
+            <Link
+              href="/pricing"
+              className="rounded-lg bg-pf-primary-container px-3 py-1.5 text-xs font-bold text-pf-on-primary-container sm:px-4 sm:py-2 sm:text-sm"
+            >
+              Upgrade
+            </Link>
+          )}
+          <SignOutButton className="rounded-lg border border-pf-outline-variant px-3 py-1.5 text-xs font-semibold text-pf-on-surface-variant transition hover:border-pf-primary-container/50 hover:text-pf-on-surface disabled:opacity-50 sm:text-sm" />
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-6xl gap-6 px-6 py-8 md:grid-cols-3">
-        <section className="space-y-4 md:col-span-2">
-          <div
+      <main className="min-h-screen pt-16 lg:ml-64">
+        <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
+          {/* Hero scanner / upload */}
+          <section
+            ref={scannerRef}
             onDrop={(e) => {
               e.preventDefault();
               const file = e.dataTransfer.files[0];
               if (file) handleImageSelect(file);
             }}
             onDragOver={(e) => e.preventDefault()}
-            onClick={() => fileInputRef.current?.click()}
-            className="cursor-pointer rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900 p-6 text-center"
+            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-pf-outline-variant/50 bg-pf-surface-container-lowest md:min-h-[360px]"
+            style={{
+              backgroundImage: "radial-gradient(circle at 2px 2px, #4f4633 1px, transparent 0)",
+              backgroundSize: "32px 32px"
+            }}
           >
             <input
               ref={fileInputRef}
@@ -239,242 +332,216 @@ export default function DashboardPage() {
                 if (file) handleImageSelect(file);
               }}
             />
-            {imagePreview ? (
-              <img src={imagePreview} alt="preview" className="mx-auto max-h-56 rounded-xl object-contain" />
-            ) : (
-              <p className="text-zinc-400">Drop image or click to upload (JPG, PNG, WEBP max 5MB)</p>
-            )}
-          </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-            <p className="mb-3 text-sm text-zinc-400">Vehicle info (optional)</p>
-            <div className="grid grid-cols-3 gap-2">
-              <input
-                placeholder="Make"
-                value={make}
-                onChange={(e) => setMake(e.target.value)}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
-              />
-              <input
-                placeholder="Model"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
-              />
-              <input
-                placeholder="Year"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
-              />
+            <div className="pointer-events-none absolute inset-0 opacity-40 transition-opacity group-hover:opacity-100">
+              <div className="viewfinder-corner left-4 top-4 rounded-tl-lg border-l-4 border-t-4 md:left-6 md:top-6" />
+              <div className="viewfinder-corner right-4 top-4 rounded-tr-lg border-r-4 border-t-4 md:right-6 md:top-6" />
+              <div className="viewfinder-corner bottom-4 left-4 rounded-bl-lg border-b-4 border-l-4 md:bottom-6 md:left-6" />
+              <div className="viewfinder-corner bottom-4 right-4 rounded-br-lg border-b-4 border-r-4 md:bottom-6 md:right-6" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-2xl px-6 text-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-pf-primary-container/20 bg-pf-primary-container/10 px-3 py-1">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-pf-primary-container" />
+                <span className="font-dashboard-mono text-[10px] uppercase tracking-wider text-pf-primary">
+                  {loading ? "Analyzing…" : "Ready to scan"}
+                </span>
+              </div>
+
+              {imagePreview ? (
+                <button type="button" onClick={pickImage} className="mx-auto mb-4 block max-h-40 overflow-hidden rounded-xl ring-2 ring-pf-primary-container/40">
+                  <img src={imagePreview} alt="Upload preview" className="max-h-40 object-contain" />
+                </button>
+              ) : (
+                <h2 className="text-2xl font-extrabold tracking-tight text-white md:text-4xl">
+                  Visual intelligence for precision identification
+                </h2>
+              )}
+
+              {!imagePreview && (
+                <p className="mx-auto mt-3 max-w-lg text-pf-on-surface-variant">
+                  Upload a photo of any automotive part. JPG, PNG, or WEBP, max 5MB.
+                </p>
+              )}
+
+              <div className="mx-auto mt-6 grid max-w-md grid-cols-3 gap-2">
+                <input
+                  placeholder="Make"
+                  value={make}
+                  onChange={(e) => setMake(e.target.value)}
+                  className="rounded-lg border border-pf-outline-variant/50 bg-pf-surface-container/80 px-3 py-2 text-sm placeholder:text-pf-on-surface-variant/60"
+                />
+                <input
+                  placeholder="Model"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  className="rounded-lg border border-pf-outline-variant/50 bg-pf-surface-container/80 px-3 py-2 text-sm placeholder:text-pf-on-surface-variant/60"
+                />
+                <input
+                  placeholder="Year"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="rounded-lg border border-pf-outline-variant/50 bg-pf-surface-container/80 px-3 py-2 text-sm placeholder:text-pf-on-surface-variant/60"
+                />
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={pickImage}
+                  className="inline-flex items-center gap-2 rounded-xl border border-pf-outline-variant px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-pf-surface-container-high"
+                >
+                  <MaterialIcon name="upload" />
+                  {imagePreview ? "Change photo" : "Upload image"}
+                </button>
+                <button
+                  type="button"
+                  disabled={!image || loading || usageLoading || remaining === null}
+                  onClick={() => void analyze()}
+                  className="inline-flex items-center gap-2 rounded-xl bg-pf-primary-container px-8 py-2.5 text-sm font-bold text-pf-on-primary-container shadow-lg shadow-pf-primary-container/20 transition-transform active:scale-[0.98] disabled:opacity-50"
+                >
+                  <MaterialIcon name="center_focus_strong" />
+                  {loading ? "Analyzing…" : "Identify part"}
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {error ? (
+            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>
+          ) : null}
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div>
+                <p className="font-dashboard-mono text-[10px] uppercase tracking-wider text-pf-on-surface-variant">Used this period</p>
+                <p className="mt-1 text-2xl font-bold text-white">{usageLoading ? "—" : userUsage?.searches_used ?? 0}</p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pf-surface-container-high text-pf-primary-container">
+                <MaterialIcon name="analytics" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div>
+                <p className="font-dashboard-mono text-[10px] uppercase tracking-wider text-pf-on-surface-variant">Remaining</p>
+                <p className="mt-1 text-2xl font-bold text-white">{usageLoading || remaining === null ? "—" : remaining}</p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pf-surface-container-high text-pf-primary-container">
+                <MaterialIcon name="inventory" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div>
+                <p className="font-dashboard-mono text-[10px] uppercase tracking-wider text-pf-on-surface-variant">Current plan</p>
+                <p className="mt-1 text-2xl font-bold capitalize text-white">{usageLoading ? "—" : planLabel}</p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pf-surface-container-high text-pf-primary-container">
+                <MaterialIcon name="verified" />
+              </div>
             </div>
           </div>
 
-          <button
-            disabled={!image || loading || usageLoading || remaining === null}
-            onClick={analyze}
-            className="w-full rounded-xl bg-amber-400 py-3 text-lg font-black text-black disabled:opacity-50"
-          >
-            {usageLoading ? "Loading Account..." : loading ? "Analyzing..." : "Identify Part"}
-          </button>
+          {/* Latest result */}
+          {result ? (
+            <section className="rounded-2xl border border-pf-primary-container/30 bg-zinc-900 p-5 md:p-6">
+              <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
+                <MaterialIcon name="check_circle" className="text-pf-primary-container" />
+                Latest identification
+              </h3>
+              <AnalysisResult
+                result={result}
+                currentSearchId={currentSearchId}
+                shareUrl={shareUrl}
+                shareLoading={shareLoading}
+                shareCopied={shareCopied}
+                onCreateShare={() => currentSearchId && void createShareLink(currentSearchId)}
+                onCopyShare={() => void copyShareLink()}
+              />
+            </section>
+          ) : null}
 
-          {error && <p className="rounded-lg bg-red-500/10 p-3 text-sm text-red-400">{error}</p>}
+          {/* Recent scans */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-white">Recent identifications</h3>
+              <span className="font-dashboard-mono text-[10px] text-pf-on-surface-variant">
+                Signed URLs ~{Math.floor(PART_IMAGE_SIGNED_URL_TTL_SECONDS / 60)} min
+              </span>
+            </div>
 
-          <p className="text-xs text-zinc-500">
-            AI identification is for reference only. Always verify with a qualified mechanic.
-          </p>
-        </section>
-
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-            <h2 className="mb-3 text-lg font-bold">Result</h2>
-            {!result ? (
-              <p className="text-sm text-zinc-500">No result yet.</p>
+            {history.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-pf-outline-variant/50 py-12 text-center text-pf-on-surface-variant">
+                No scans yet. Upload a part photo above.
+              </p>
             ) : (
-              <div className="space-y-3 text-sm">
-                <p><span className="text-zinc-400">Part:</span> {result.partName}</p>
-                <p><span className="text-zinc-400">OEM:</span> {result.oemCode}</p>
-                <p><span className="text-zinc-400">Category:</span> {result.category}</p>
-                <p><span className="text-zinc-400">Confidence:</span> {result.confidence}</p>
-                <p className="text-zinc-300">{result.description}</p>
-
-                {result.estimatedDamage && (
-                  <div className="rounded-xl border border-amber-400/25 bg-amber-400/5 p-3">
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-amber-400">
-                      Estimated damage
-                    </p>
-                    <p className="text-sm leading-relaxed text-zinc-200">{result.estimatedDamage}</p>
-                  </div>
-                )}
-
-                {result.damageRelatedParts && result.damageRelatedParts.length > 0 && (
-                  <div>
-                    <p className="mb-1 text-xs text-zinc-500">Likely related parts</p>
-                    <div className="flex flex-wrap gap-1">
-                      {result.damageRelatedParts.map((p) => (
-                        <span key={p} className="rounded-md bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
-                          {p}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {(result.marketplaceListings ?? []).length > 0 && (
-                  <div>
-                    <p className="mb-1 text-xs font-semibold text-zinc-400">Sample listings (max 3)</p>
-                    <p className="mb-2 text-xs text-zinc-500">
-                      {"Prices and stock are AI-assisted estimates — always confirm on the retailer's site."}
-                    </p>
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {(result.marketplaceListings ?? []).slice(0, 3).map((listing, idx) => (
-                        <a
-                          key={`${idx}-${listing.site}-${listing.listingUrl}`}
-                          href={listing.listingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex flex-col overflow-hidden rounded-xl border border-zinc-700 bg-zinc-800/80 transition-opacity hover:opacity-90"
-                        >
-                          <div className="relative aspect-[4/3] bg-zinc-900">
-                            {listing.imageUrl ? (
-                              <img
-                                src={listing.imageUrl}
-                                alt=""
-                                className="h-full w-full object-cover"
-                                referrerPolicy="no-referrer"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = "none";
-                                }}
-                              />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-xs text-zinc-600">
-                                No image
-                              </div>
-                            )}
-                            <span className="absolute left-2 top-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white">
-                              {listing.site}
-                            </span>
-                          </div>
-                          <div className="flex flex-1 flex-col gap-1 p-2">
-                            <p className="line-clamp-2 text-xs font-medium text-zinc-100">{listing.title}</p>
-                            <p className="text-sm font-black text-amber-400">{listing.priceDisplay}</p>
-                            <span
-                              className={`inline-flex w-fit rounded px-2 py-0.5 text-[10px] font-bold ${
-                                listing.inStock
-                                  ? "bg-emerald-500/20 text-emerald-300"
-                                  : "bg-zinc-600/40 text-zinc-400"
-                              }`}
-                            >
-                              {listing.inStock ? "In stock (estimate)" : "Stock unknown / out"}
-                            </span>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <a href={result.searchLinks.amazon} target="_blank" rel="noreferrer" className="text-amber-400">Amazon</a>
-                  <a href={result.searchLinks.rockauto} target="_blank" rel="noreferrer" className="text-amber-400">RockAuto</a>
-                  <a href={result.searchLinks.autozone} target="_blank" rel="noreferrer" className="text-amber-400">AutoZone</a>
-                </div>
-
-                {result.additionalNotes ? (
-                  <div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-2 text-xs text-zinc-400">
-                    {result.additionalNotes}
-                  </div>
-                ) : null}
-
-                {currentSearchId ? (
-                  <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-3">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Share report</p>
-                    <p className="mb-2 text-[11px] text-zinc-500">Read-only link, valid for 7 days. Recipient can print or save as PDF.</p>
-                    {!shareUrl ? (
-                      <button
-                        type="button"
-                        disabled={shareLoading}
-                        onClick={() => void createShareLink(currentSearchId)}
-                        className="w-full rounded-lg bg-zinc-700 py-2 text-xs font-bold text-white hover:bg-zinc-600 disabled:opacity-50"
-                      >
-                        {shareLoading ? "Creating link..." : "Create share link"}
-                      </button>
-                    ) : (
-                      <div className="space-y-2">
-                        <input
-                          readOnly
-                          value={shareUrl}
-                          className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-300"
+              <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {history.slice(0, 4).map((item) => (
+                    <div
+                      key={item.id}
+                      className="group cursor-default rounded-2xl border border-zinc-800 bg-zinc-900 p-4 transition-colors hover:border-pf-primary-container/50"
+                    >
+                      <div className="relative mb-3 aspect-square overflow-hidden rounded-xl bg-pf-surface-container-lowest">
+                        <img
+                          src={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading="lazy"
                         />
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => void copyShareLink()}
-                            className="flex-1 rounded-lg bg-amber-400 py-2 text-xs font-bold text-black"
-                          >
-                            {shareCopied ? "Copied" : "Copy link"}
-                          </button>
-                          <a
-                            href={shareUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 rounded-lg border border-zinc-600 py-2 text-center text-xs font-semibold text-zinc-200"
-                          >
-                            Open
-                          </a>
+                        <div className="absolute right-2 top-2 rounded-lg border border-zinc-700 bg-zinc-950/80 px-2 py-0.5 backdrop-blur-md">
+                          <p className="font-dashboard-mono text-[10px] text-pf-primary-container">
+                            {confidenceLabel(item.result_json.confidence)}
+                          </p>
                         </div>
                       </div>
-                    )}
+                      <h4 className="line-clamp-2 text-sm font-semibold text-white">{item.result_json.partName}</h4>
+                      <div className="mt-1 flex items-center justify-between font-dashboard-mono text-[10px] text-pf-on-surface-variant">
+                        <span className="truncate">{item.result_json.oemCode}</span>
+                        <span>{formatRelativeTime(item.created_at)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {history.length > 0 ? (
+                  <div className="space-y-2 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-pf-on-surface-variant">All recent</p>
+                    {history.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3 rounded-lg bg-pf-surface-container-high/50 p-2">
+                        <img
+                          src={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                          alt=""
+                          className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                          loading="lazy"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-pf-primary-container">{item.result_json.partName}</p>
+                          <p className="text-xs text-pf-on-surface-variant">{formatRelativeTime(item.created_at)}</p>
+                        </div>
+                        <a
+                          href={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-pf-on-surface-variant hover:text-pf-primary"
+                        >
+                          Open
+                        </a>
+                      </div>
+                    ))}
                   </div>
                 ) : null}
-              </div>
+              </>
             )}
-          </div>
+          </section>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-            <h2 className="mb-3 text-lg font-bold">Last 10 Searches</h2>
-            <p className="mb-3 text-[11px] leading-relaxed text-zinc-500">
-              Thumbnails open through a short-lived signed link (about {Math.floor(PART_IMAGE_SIGNED_URL_TTL_SECONDS / 60)} minutes) for privacy.
-            </p>
-            <div className="space-y-2">
-              {history.length === 0 && <p className="text-sm text-zinc-500">No history yet.</p>}
-              {history.map((item) => (
-                <div key={item.id} className="flex gap-3 rounded-lg bg-zinc-800 p-2 text-xs">
-                  <a
-                    href={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-zinc-600 bg-zinc-900"
-                    title="View photo (short-lived link)"
-                  >
-                    {/* Same-origin URL redirects to a time-limited signed Supabase URL */}
-                    <img
-                      src={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
-                      alt=""
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  </a>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-amber-400">{item.result_json.partName}</p>
-                    <p className="text-zinc-400">{new Date(item.created_at).toLocaleString()}</p>
-                    <a
-                      href={`/api/me/search-image?searchId=${encodeURIComponent(item.id)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-block text-[10px] text-zinc-500 underline hover:text-amber-400"
-                    >
-                      Open original
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
-      </div>
+          <p className="text-center text-xs text-pf-on-surface-variant/80">
+            AI identification is for reference only. Always verify fitment with a qualified technician.
+          </p>
+        </div>
+      </main>
 
       <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
-    </main>
+    </div>
   );
 }
