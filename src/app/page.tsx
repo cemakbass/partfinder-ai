@@ -97,38 +97,32 @@ const features = [
   {
     title: "Photo → identified part",
     body: "Drop a picture of a worn, broken, or mystery component. Vision AI reads shape, markings, and context to suggest a part name, category, and OEM-style reference code.",
-    icon: IconCamera,
-    image: MARKETING_IMAGES.brakePad
+    icon: IconCamera
   },
   {
     title: "Fitment you can act on",
     body: "See likely compatible makes, models, and years—not just a guess—so you can double-check with your VIN or parts desk before you order.",
-    icon: IconTruck,
-    image: MARKETING_IMAGES.fuelSystem
+    icon: IconTruck
   },
   {
     title: "US retailer shortcuts",
     body: "Jump to Amazon, RockAuto, AutoZone, and O'Reilly with prefilled search context—built for how American DIYers and shops already buy parts.",
-    icon: IconCart,
-    image: MARKETING_IMAGES.hvac
+    icon: IconCart
   },
   {
     title: "Collision & listing context",
     body: "Optional damage notes, related parts to inspect, and up to three synthesized marketplace-style listings with prices and stock hints—always verify on the seller’s site.",
-    icon: IconBolt,
-    image: MARKETING_IMAGES.sensor
+    icon: IconBolt
   },
   {
     title: "History on your account",
     body: "Signed-in users keep a rolling history of analyses so you can revisit a job site photo or share results with a shop or insurer.",
-    icon: IconClock,
-    image: MARKETING_IMAGES.climate
+    icon: IconClock
   },
   {
     title: "Plans that match volume",
     body: "Start on a free monthly allowance, then scale with Stripe-backed subscriptions when you’re running regular estimates or fleet checks.",
-    icon: IconShield,
-    image: MARKETING_IMAGES.electrical
+    icon: IconShield
   }
 ] as const;
 
@@ -153,23 +147,19 @@ const steps = [
 const usAudiences = [
   {
     title: "DIY & weekend wrenchers",
-    body: "Skip hours of forum scrolling. Get a starting OEM reference and fitment direction before you drive to the parts store or order online for delivery across the US.",
-    image: MARKETING_IMAGES.brakePad
+    body: "Skip hours of forum scrolling. Get a starting OEM reference and fitment direction before you drive to the parts store or order online for delivery across the US."
   },
   {
     title: "Independent repair shops",
-    body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber.",
-    image: MARKETING_IMAGES.fuelSystem
+    body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber."
   },
   {
     title: "Collision & body shops",
-    body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review.",
-    image: MARKETING_IMAGES.sensor
+    body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review."
   },
   {
     title: "Salvage & fleet operations",
-    body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible.",
-    image: MARKETING_IMAGES.drivetrain
+    body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible."
   }
 ] as const;
 
@@ -269,17 +259,11 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map(({ title, body, icon: Icon, image }) => (
+            {features.map(({ title, body, icon: Icon }) => (
               <article
                 key={title}
-                className="group overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 transition hover:border-zinc-700 hover:bg-zinc-900/80"
+                className="group rounded-2xl border border-zinc-800 bg-zinc-950/60 transition hover:border-zinc-700 hover:bg-zinc-900/80"
               >
-                {image ? (
-                  <div className="relative aspect-[16/10] overflow-hidden border-b border-zinc-800">
-                    <ProductImage image={image} sizes="(max-width: 768px) 100vw, 33vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent pointer-events-none" />
-                  </div>
-                ) : null}
                 <div className="p-6">
                   <div className="mb-4 inline-flex rounded-xl bg-amber-400/10 p-3 text-amber-400 transition group-hover:bg-amber-400/15">
                     <Icon className="h-6 w-6" />
@@ -303,16 +287,10 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2">
-            {usAudiences.map(({ title, body, image }) => (
-              <article key={title} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
-                <div className="relative aspect-[2/1] sm:aspect-[5/2]">
-                  <ProductImage image={image} sizes="(max-width: 640px) 100vw, 50vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent pointer-events-none" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-white">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
-                </div>
+            {usAudiences.map(({ title, body }) => (
+              <article key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+                <h3 className="text-lg font-bold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
               </article>
             ))}
           </div>
@@ -322,12 +300,7 @@ export default function LandingPage() {
       <PartGallery />
 
       <section className="px-4 py-16 sm:px-6" aria-labelledby="seo-topics">
-        <div className="mx-auto grid max-w-6xl gap-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 lg:grid-cols-2 lg:gap-0">
-          <div className="relative min-h-[220px] lg:min-h-full">
-            <ProductImage image={MARKETING_IMAGES.hvac} sizes="(max-width: 1024px) 100vw, 50vw" />
-            <div className="absolute inset-0 bg-zinc-950/40 lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-900/90 pointer-events-none" />
-          </div>
-          <div className="p-8 sm:p-10">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 sm:p-10">
           <h2 id="seo-topics" className="text-2xl font-black tracking-tight sm:text-3xl">
             Car part lookup by photo — how US teams use PartFinder AI
           </h2>
@@ -344,7 +317,6 @@ export default function LandingPage() {
               research aids—always confirm against your VIN, trim level, and supplier catalog before install or warranty decisions.
             </p>
             <p className="text-zinc-500">Common searches we support: {usKeywordsBlock.join(" · ")}.</p>
-          </div>
           </div>
         </div>
       </section>
