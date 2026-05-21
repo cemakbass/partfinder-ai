@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-client";
+import { AuthVisualPanel } from "@/components/marketing/auth-visual-panel";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -61,8 +62,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
-      <div className="mx-auto max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <main className="min-h-screen bg-zinc-950 px-4 py-8 text-white sm:px-6 sm:py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-5xl gap-8 lg:grid-cols-2 lg:items-stretch">
+        <AuthVisualPanel variant="login" />
+        <div className="flex flex-col justify-center rounded-2xl border border-zinc-800 bg-zinc-900 p-6 sm:p-8">
+        <Link href="/" className="mb-6 text-lg font-black lg:hidden">
+          Part<span className="text-amber-400">Finder</span> AI
+        </Link>
         <h1 className="mb-6 text-3xl font-black">Login</h1>
         {!supabase ? (
           <div className="rounded-xl border border-amber-500/30 bg-zinc-950/80 p-4 text-sm text-zinc-400">
@@ -116,6 +122,7 @@ export default function LoginPage() {
           </Link>
         </p>
         )}
+        </div>
       </div>
     </main>
   );

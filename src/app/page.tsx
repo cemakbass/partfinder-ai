@@ -1,7 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
+import { HeroVisual } from "@/components/marketing/hero-visual";
+import { PartGallery } from "@/components/marketing/part-gallery";
 import { HomeJsonLd, homeFaqs } from "@/components/seo/home-json-ld";
+import { MARKETING_IMAGES } from "@/lib/marketing-images";
 import { buildPageMetadata } from "@/lib/seo";
 import { PLAN_CONFIG, PLANS } from "@/lib/plans";
 
@@ -93,66 +97,79 @@ const features = [
   {
     title: "Photo → identified part",
     body: "Drop a picture of a worn, broken, or mystery component. Vision AI reads shape, markings, and context to suggest a part name, category, and OEM-style reference code.",
-    icon: IconCamera
+    icon: IconCamera,
+    image: MARKETING_IMAGES.brakePad
   },
   {
     title: "Fitment you can act on",
     body: "See likely compatible makes, models, and years—not just a guess—so you can double-check with your VIN or parts desk before you order.",
-    icon: IconTruck
+    icon: IconTruck,
+    image: MARKETING_IMAGES.engineScan
   },
   {
     title: "US retailer shortcuts",
     body: "Jump to Amazon, RockAuto, AutoZone, and O'Reilly with prefilled search context—built for how American DIYers and shops already buy parts.",
-    icon: IconCart
+    icon: IconCart,
+    image: MARKETING_IMAGES.logistics
   },
   {
     title: "Collision & listing context",
     body: "Optional damage notes, related parts to inspect, and up to three synthesized marketplace-style listings with prices and stock hints—always verify on the seller’s site.",
-    icon: IconBolt
+    icon: IconBolt,
+    image: MARKETING_IMAGES.heroWorkshop
   },
   {
     title: "History on your account",
     body: "Signed-in users keep a rolling history of analyses so you can revisit a job site photo or share results with a shop or insurer.",
-    icon: IconClock
+    icon: IconClock,
+    image: MARKETING_IMAGES.aiViz
   },
   {
     title: "Plans that match volume",
     body: "Start on a free monthly allowance, then scale with Stripe-backed subscriptions when you’re running regular estimates or fleet checks.",
-    icon: IconShield
+    icon: IconShield,
+    image: MARKETING_IMAGES.sparkPlug
   }
 ] as const;
 
 const steps = [
   {
     title: "Capture the part",
-    body: "Use your phone in the bay or lot. Include part numbers or stampings when visible—optional vehicle fields sharpen results."
+    body: "Use your phone in the bay or lot. Include part numbers or stampings when visible—optional vehicle fields sharpen results.",
+    image: MARKETING_IMAGES.brakePad
   },
   {
     title: "Run the analyzer",
-    body: "Our engine calls a leading vision model, then structures OEM clues, fitment, links, and notes into a single readable report."
+    body: "Our engine calls a leading vision model, then structures OEM clues, fitment, links, and notes into a single readable report.",
+    image: MARKETING_IMAGES.aiViz
   },
   {
     title: "Verify & purchase",
-    body: "Use the report as a lab notebook, not a warranty. Confirm with a pro, then follow retailer links or your preferred supplier."
+    body: "Use the report as a lab notebook, not a warranty. Confirm with a pro, then follow retailer links or your preferred supplier.",
+    image: MARKETING_IMAGES.sparkPlug
   }
 ] as const;
 
 const usAudiences = [
   {
     title: "DIY & weekend wrenchers",
-    body: "Skip hours of forum scrolling. Get a starting OEM reference and fitment direction before you drive to the parts store or order online for delivery across the US."
+    body: "Skip hours of forum scrolling. Get a starting OEM reference and fitment direction before you drive to the parts store or order online for delivery across the US.",
+    image: MARKETING_IMAGES.brakePad
   },
   {
     title: "Independent repair shops",
-    body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber."
+    body: "Front-counter teams use PartFinder AI to document mystery components, attach photos to estimates, and speed up calls to NAPA, O'Reilly, or your jobber.",
+    image: MARKETING_IMAGES.oilFilter
   },
   {
     title: "Collision & body shops",
-    body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review."
+    body: "Estimators capture damaged parts on the lift, note related components to inspect, and produce shareable summaries for supplements and insurer review.",
+    image: MARKETING_IMAGES.heroWorkshop
   },
   {
     title: "Salvage & fleet operations",
-    body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible."
+    body: "Yard staff and fleet managers label unknown inventory faster—especially when tags are missing but the casting or bracket profile is visible.",
+    image: MARKETING_IMAGES.engineScan
   }
 ] as const;
 
@@ -163,36 +180,6 @@ const usKeywordsBlock = [
   "collision parts catalog search",
   "aftermarket vs OEM cross-reference starting point"
 ];
-
-function HeroMockCard() {
-  return (
-    <div className="relative rounded-2xl border border-zinc-700/80 bg-zinc-900/90 p-5 shadow-2xl shadow-black/40 ring-1 ring-white/5 backdrop-blur-sm">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-amber-400/90">Sample output</span>
-        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-400">Illustrative</span>
-      </div>
-      <p className="text-sm font-bold text-white">Front lower control arm — LH</p>
-      <p className="mt-1 font-mono text-xs text-zinc-500">OEM-style ref · MC5Z-3078-B</p>
-      <div className="mt-4 space-y-2 border-t border-zinc-800 pt-4 text-xs text-zinc-400">
-        <p>
-          <span className="text-zinc-500">Fitment · </span>
-          F-150 2015–2020 (verify trim)
-        </p>
-        <p>
-          <span className="text-zinc-500">Retail · </span>
-          Amazon · RockAuto · AutoZone
-        </p>
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {["High confidence", "Damage note", "3 listing hints"].map((tag) => (
-            <span key={tag} className="rounded-md bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-300">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function LandingPage() {
   return (
@@ -207,6 +194,9 @@ export default function LandingPage() {
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="#features" className="hidden text-sm text-zinc-400 hover:text-white md:inline">
               Product
+            </Link>
+            <Link href="/blog" className="hidden text-sm text-zinc-400 hover:text-white md:inline">
+              Blog
             </Link>
             <Link href="#pricing" className="hidden text-sm text-zinc-400 hover:text-white md:inline">
               Pricing
@@ -266,10 +256,7 @@ export default function LandingPage() {
               {PLAN_CONFIG.free.searchLimit} included identifications per month on the free tier—no card required.
             </p>
           </div>
-          <div className="relative lg:pl-4">
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-500/10 via-transparent to-zinc-800/30 blur-2xl" aria-hidden />
-            <HeroMockCard />
-          </div>
+          <HeroVisual />
         </div>
       </section>
 
@@ -282,16 +269,30 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map(({ title, body, icon: Icon }) => (
+            {features.map(({ title, body, icon: Icon, image }) => (
               <article
                 key={title}
-                className="group rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/80"
+                className="group overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 transition hover:border-zinc-700 hover:bg-zinc-900/80"
               >
-                <div className="mb-4 inline-flex rounded-xl bg-amber-400/10 p-3 text-amber-400 transition group-hover:bg-amber-400/15">
-                  <Icon className="h-6 w-6" />
+                {image ? (
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
+                  </div>
+                ) : null}
+                <div className="p-6">
+                  <div className="mb-4 inline-flex rounded-xl bg-amber-400/10 p-3 text-amber-400 transition group-hover:bg-amber-400/15">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-bold">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
                 </div>
-                <h3 className="text-lg font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
               </article>
             ))}
           </div>
@@ -308,18 +309,37 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2">
-            {usAudiences.map(({ title, body }) => (
-              <article key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-                <h3 className="text-lg font-bold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
+            {usAudiences.map(({ title, body, image }) => (
+              <article key={title} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+                <div className="relative aspect-[2/1] sm:aspect-[5/2]">
+                  <Image src={image.src} alt={image.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-white">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{body}</p>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
+      <PartGallery />
+
       <section className="px-4 py-16 sm:px-6" aria-labelledby="seo-topics">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-zinc-800 bg-zinc-900/30 p-8 sm:p-10">
+        <div className="mx-auto grid max-w-6xl gap-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 lg:grid-cols-2 lg:gap-0">
+          <div className="relative min-h-[220px] lg:min-h-full">
+            <Image
+              src={MARKETING_IMAGES.logistics.src}
+              alt={MARKETING_IMAGES.logistics.alt}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+            <div className="absolute inset-0 bg-zinc-950/50 lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-900/90" />
+          </div>
+          <div className="p-8 sm:p-10">
           <h2 id="seo-topics" className="text-2xl font-black tracking-tight sm:text-3xl">
             Car part lookup by photo — how US teams use PartFinder AI
           </h2>
@@ -337,6 +357,7 @@ export default function LandingPage() {
             </p>
             <p className="text-zinc-500">Common searches we support: {usKeywordsBlock.join(" · ")}.</p>
           </div>
+          </div>
         </div>
       </section>
 
@@ -348,12 +369,18 @@ export default function LandingPage() {
           </p>
           <ol className="mt-14 grid gap-8 md:grid-cols-3">
             {steps.map((item, idx) => (
-              <li key={item.title} className="relative rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 pt-10">
-                <span className="absolute left-6 top-0 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-amber-400 text-sm font-black text-black">
-                  {idx + 1}
-                </span>
-                <h3 className="text-xl font-bold">{item.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-400">{item.body}</p>
+              <li key={item.title} className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 pt-10">
+                <div className="relative aspect-[16/10]">
+                  <Image src={item.image.src} alt={item.image.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/30 to-transparent" />
+                </div>
+                <div className="relative p-6">
+                  <span className="absolute left-6 top-0 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-amber-400 text-sm font-black text-black">
+                    {idx + 1}
+                  </span>
+                  <h3 className="text-xl font-bold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-400">{item.body}</p>
+                </div>
               </li>
             ))}
           </ol>
@@ -449,8 +476,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-t border-zinc-800 bg-gradient-to-b from-amber-500/10 to-zinc-950 px-4 py-16 sm:px-6">
-        <div className="mx-auto max-w-4xl text-center">
+      <section className="relative overflow-hidden border-t border-zinc-800 px-4 py-16 sm:px-6">
+        <div className="absolute inset-0">
+          <Image
+            src={MARKETING_IMAGES.heroWorkshop.src}
+            alt=""
+            fill
+            className="object-cover opacity-25"
+            sizes="100vw"
+            aria-hidden
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-950/90 to-amber-500/10" aria-hidden />
+        </div>
+        <div className="relative mx-auto max-w-4xl text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to name that part?</h2>
           <p className="mt-3 text-zinc-400">Create an account in under a minute and run your first identification today.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">

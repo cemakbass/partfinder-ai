@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PLAN_CONFIG } from "@/lib/plans";
+import { MARKETING_IMAGES } from "@/lib/marketing-images";
 import { SignOutButton } from "@/components/sign-out-button";
 
 const paidPlans = ["starter", "pro", "ultra"] as const;
@@ -87,9 +89,21 @@ export default function PricingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-12 text-white">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex flex-wrap items-center justify-end gap-3">
+    <main className="min-h-screen bg-zinc-950 text-white">
+      <div className="relative overflow-hidden border-b border-zinc-800">
+        <div className="absolute inset-0">
+          <Image
+            src={MARKETING_IMAGES.aiViz.src}
+            alt=""
+            fill
+            className="object-cover opacity-30"
+            sizes="100vw"
+            aria-hidden
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/80 via-zinc-950 to-zinc-950" />
+        </div>
+        <div className="relative mx-auto max-w-5xl px-6 pb-10 pt-8">
+        <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
           <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white">
             Dashboard
           </Link>
@@ -106,9 +120,12 @@ export default function PricingPage() {
           <SignOutButton />
         </div>
         <h1 className="mb-3 text-center text-4xl font-black">US auto part identification pricing</h1>
-        <p className="mb-10 text-center text-zinc-400">
+        <p className="mx-auto mb-2 max-w-2xl text-center text-zinc-400">
           Choose a monthly plan for photo-based OEM lookup and fitment research. Sign in required. Secure checkout via Stripe (USD).
         </p>
+        </div>
+      </div>
+      <div className="mx-auto max-w-5xl px-6 py-12">
         {error && (
           <div className="mb-6 rounded-xl border border-red-900/60 bg-red-950/40 px-4 py-3 text-center text-sm text-red-200">
             <p className="font-semibold">Checkout could not start</p>
