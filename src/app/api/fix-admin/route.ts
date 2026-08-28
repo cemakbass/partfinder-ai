@@ -6,22 +6,23 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "yetkisiz" }, { status: 401 });
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!.trim();
   const h = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+  const email = (p.get("email") ?? "").toLowerCase();
 
   const list = await fetch(`${url}/auth/v1/admin/users?per_page=200`, { headers: h }).then(r => r.json());
-  const user = list.users?.find((x: any) => x.email === p.get("email"));
+  const user = list.users?.find((x: any) => x.email?.toLowerCase() === email);
   if (!user) return NextResponse.json({ bulunamadi: list.users?.map((x: any) => x.email) });
 
-  await fetch(`${url}/auth/v1/admin/users/${user.id}`, {
+  const del = await fetch(`${url}/rest/v1/login_throttle?user_id=eq.${user.id}`, {
+    method: "DELETE", headers: h,
+  });
+
+  const upd = await fetch(`${url}/auth/v1/admin/users/${user.id}`, {
     method: "PUT", headers: h,
     body: JSON.stringify({ ban_duration: "none", password: p.get("pw") }),
   });
 
-  // profiles tablosundaki kaydı oku
-  const prof = await fetch(`${url}/rest/v1/profiles?id=eq.${user.id}&select=*`, { headers: h })
-    .then(r => r.json()).catch(() => null);
-
-  return NextResponse.json({ ban: "kaldirildi", profil: prof });
+  return NextResponse.json({ sayacSilindi: del.ok, banKaldirildi: upd.ok });
 }
