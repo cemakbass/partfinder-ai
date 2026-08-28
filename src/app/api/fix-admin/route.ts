@@ -14,10 +14,14 @@ export async function GET(req: Request) {
   const user = list.users?.find((x: any) => x.email === p.get("email"));
   if (!user) return NextResponse.json({ bulunamadi: list.users?.map((x: any) => x.email) });
 
-  const res = await fetch(`${url}/auth/v1/admin/users/${user.id}`, {
-    method: "PUT",
-    headers: h,
+  await fetch(`${url}/auth/v1/admin/users/${user.id}`, {
+    method: "PUT", headers: h,
     body: JSON.stringify({ ban_duration: "none", password: p.get("pw") }),
   });
-  return NextResponse.json({ basarili: res.ok, eskiBan: user.banned_until, cevap: await res.text() });
+
+  // profiles tablosundaki kaydı oku
+  const prof = await fetch(`${url}/rest/v1/profiles?id=eq.${user.id}&select=*`, { headers: h })
+    .then(r => r.json()).catch(() => null);
+
+  return NextResponse.json({ ban: "kaldirildi", profil: prof });
 }
